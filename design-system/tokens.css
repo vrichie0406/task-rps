@@ -1,0 +1,150 @@
+/*
+  Terra — Design tokens
+  Precision-agriculture UI system. One token set, consumed by every
+  component in components.css and every screen in the product.
+*/
+:root{
+  /* ---------- Core palette ---------- */
+  --lime-50:  #F5FCE3;
+  --lime-100: #E8F9BE;
+  --lime-300: #C8EE72;
+  --lime-400: #B7EA48;
+  --lime-500: #A8E22F;   /* primary brand accent */
+  --lime-600: #8FC922;
+  --lime-700: #6E9C1B;
+
+  --ink-900: #14150F;    /* near-black, warm */
+  --ink-800: #1D2017;
+  --ink-700: #2B2F23;
+  --ink-600: #454A3B;
+  --ink-500: #666B5B;
+  --ink-400: #8A8F80;
+  --ink-300: #AFB4A5;
+
+  --violet-700: #5A3FC0;  /* "very high" zone dot */
+  --violet-500: #7C5CFA;  /* "high" zone dot */
+  --violet-300: #C6B8FA;  /* "average" zone dot */
+  --violet-100: #EDE8FE;
+
+  --neutral-000: #FFFFFF;
+  --neutral-50:  #F4F5F2;
+  --neutral-100: #E9EBE5;
+  --neutral-150: #E2E4DE;
+  --neutral-200: #D7DAD0;
+  --neutral-300: #C2C6B9;
+
+  /* Warm-leaning red, so destructive UI sits with the ink/lime palette
+     rather than reading as a cold crimson pasted in from elsewhere. */
+  --red-50:  #FEF3F3;
+  --red-100: #FBDFE0;
+  --red-300: #F3A3A5;
+  --red-500: #E5484D;    /* signal only — see --danger before using on text */
+  --red-600: #CC3238;
+  --red-700: #A6262C;
+
+  --blue-500: #3B82F6;
+
+  /* ---------- Semantic roles ---------- */
+  --bg-app:        var(--neutral-100);
+  --bg-canvas:     var(--neutral-50);
+  --surface:       var(--neutral-000);
+  --surface-sunken: var(--neutral-50);
+  --surface-dark:  var(--ink-900);
+
+  --text-primary:   var(--ink-900);
+  --text-secondary: var(--ink-500);
+  --text-tertiary:  var(--ink-400);
+  --text-on-dark:   var(--neutral-000);
+  --text-on-dark-soft: rgba(255,255,255,.72);
+  --text-on-lime:   var(--ink-900);
+  --text-link:      var(--ink-700);
+
+  --border-subtle: rgba(20,21,15,.08);
+  --border-default: rgba(20,21,15,.12);
+  --border-on-dark: rgba(255,255,255,.16);
+
+  --accent:        var(--lime-500);
+  --accent-strong: var(--lime-600);
+  --accent-soft:   var(--lime-100);
+
+  --zone-very-high: var(--violet-700);
+  --zone-high:      var(--violet-500);
+  --zone-average:   var(--violet-300);
+  --zone-low:       var(--neutral-200);
+
+  --live: var(--red-500);
+
+  /* Destructive / error roles.
+     --danger is red-600, not red-500: at Terra's 14.5px bold button text,
+     white on red-500 is 3.9:1 and fails AA, while red-600 clears it at 5.1:1.
+     red-500 stays the signal colour for dots and indicators, where the
+     contrast rule does not apply. */
+  --danger:        var(--red-600);
+  --danger-strong: var(--red-700);
+  --danger-soft:   var(--red-50);
+  --danger-border: var(--red-300);
+  --text-on-danger: var(--neutral-000);
+  --text-danger:   var(--red-700);
+
+  /* ---------- Typography ---------- */
+  --font-sans: 'Terra Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  --text-2xs:  11px;
+  --text-xs:   12px;
+  --text-sm:   13px;
+  --text-md:   14.5px;
+  --text-base: 15px;
+  --text-lg:   17px;
+  --text-xl:   21px;
+  --text-2xl:  28px;
+  --text-3xl:  36px;
+  --text-4xl:  48px;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.55;
+
+  /* ---------- Spacing scale (4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ---------- Radius scale ---------- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+
+  /* ---------- Elevation ---------- */
+  --shadow-sm: 0 1px 2px rgba(20,21,15,.05), 0 1px 1px rgba(20,21,15,.04);
+  --shadow-md: 0 8px 24px -8px rgba(20,21,15,.16);
+  --shadow-lg: 0 24px 48px -16px rgba(20,21,15,.24);
+  --shadow-lime: 0 12px 28px -10px rgba(168,226,47,.55);
+
+  /* ---------- Motion ---------- */
+  --ease-standard: cubic-bezier(.2,.7,.3,1);
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --duration-slow: 360ms;
+}
+
+/*
+  Terra is a deliberately light system — the product lives on paper-white
+  and warm-neutral grounds, with ink reserved for small high-contrast
+  elements (primary buttons, circular actions) and for text sitting over
+  field photography. There is no dark theme by design.
+*/
+

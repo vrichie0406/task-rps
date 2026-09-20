@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PalmTrack Farm App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="The PalmTrack farm-worker app — onboarding, home, voice capture, Anara processing and log review — built entirely from the Terra design system.">
+<link rel="stylesheet" href="design-system/tokens.css">
+<link rel="stylesheet" href="design-system/textures.css">
+<link rel="stylesheet" href="design-system/components.css">
+<style>
+  *,*::before,*::after{ box-sizing:border-box; }
+  body{ margin:0; background:var(--bg-app); font-family:var(--font-sans); min-height:100vh; }
+
+  /* @preview-shell-start — desktop preview chrome; build-mobile.js drops this */
+  .stage{ display:flex; gap:40px; align-items:flex-start; max-width:1180px; margin:0 auto; padding:44px 24px; flex-wrap:wrap; justify-content:center; }
+
+  /* ---- side panel (documentation rail, not part of the product) ---- */
+  .panel{ width:300px; flex-shrink:0; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:26px; position:sticky; top:44px; }
+  .panel .brand-row{ display:flex; align-items:center; gap:9px; margin-bottom:18px; }
+  .panel .mark{ width:26px; height:26px; border-radius:8px; background:var(--ink-900); display:flex; align-items:center; justify-content:center; }
+  .panel .mark span{ width:10px; height:10px; border-radius:3px; background:var(--accent); display:block; }
+  .panel .brand-name{ font-weight:700; font-size:14px; }
+  .panel h1{ font-size:20px; font-weight:700; letter-spacing:var(--tracking-tight); margin:0 0 10px; }
+  .panel p.desc{ font-size:13px; color:var(--text-secondary); line-height:1.6; margin:0 0 20px; }
+  .panel .group-label{ font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--text-tertiary); margin:16px 0 8px; }
+  .jump-btn{
+    display:flex; align-items:center; gap:9px; width:100%; text-align:left; font-family:inherit;
+    background:var(--surface-sunken); border:1px solid var(--border-subtle); border-radius:var(--radius-md);
+    padding:9px 11px; font-size:13px; font-weight:700; color:var(--text-secondary); cursor:pointer; margin-bottom:6px;
+    transition:background .12s, border-color .12s;
+  }
+  .jump-btn:hover{ border-color:var(--border-default); }
+  .jump-btn.is-current{ background:var(--lime-100); border-color:var(--lime-300); color:var(--ink-800); }
+  .jump-btn .num{ min-width:18px; height:18px; border-radius:50%; background:var(--neutral-200); color:var(--text-secondary); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .jump-btn.is-current .num{ background:var(--accent-strong); color:var(--neutral-000); }
+  .panel .foot-hint{ margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle); font-size:11.5px; color:var(--text-tertiary); line-height:1.6; }
+  .panel .foot-hint a{ color:var(--text-link); font-weight:700; text-decoration:none; }
+
+  /* ---- phone frame ---- */
+  .phone-wrap{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .phone-frame{ width:390px; height:844px; background:var(--ink-900); border-radius:46px; padding:12px; box-shadow:var(--shadow-lg); position:relative; }
+  .phone-frame::before{ content:''; position:absolute; top:12px; left:50%; transform:translateX(-50%); width:120px; height:26px; background:var(--ink-900); border-radius:0 0 16px 16px; z-index:30; }
+  .phone-screen{ width:100%; height:100%; background:var(--surface); border-radius:36px; overflow:hidden; position:relative; }
+  .phone-caption{ font-size:12px; color:var(--text-tertiary); font-weight:600; }
+  @media (max-width:900px){
+    .panel{ position:static; width:100%; max-width:390px; }
+    .phone-frame{ transform-origin:top center; }
+  }
+  /* @preview-shell-end */
+
+  .screen{ position:absolute; inset:0; display:flex; flex-direction:column; background:var(--surface); opacity:0; pointer-events:none; }
+  .screen.is-active{ opacity:1; pointer-events:auto; animation:terra-slide-in .26s var(--ease-standard); }
+  @keyframes terra-slide-in{ from{ opacity:0; transform:translateX(20px); } to{ opacity:1; transform:translateX(0); } }
+
+  .px{ padding-left:20px; padding-right:20px; }
+  .scroll-body{ flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:16px; }
+  .scroll-body > *{ flex-shrink:0; }
+  .sb-pad{ padding-top:16px; }
+
+  /* ---- Onboarding ---- */
+  #screen-onboarding .scroll-body{ background:var(--bg-canvas); padding-top:8px; padding-bottom:20px; }
+  .ob-hero{ height:150px; border-radius:var(--radius-xl); background-image:var(--tex-corn-field); background-size:cover; background-position:center; position:relative; overflow:hidden; display:flex; align-items:flex-end; padding:16px; }
+  .ob-hero::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,14,6,.05), rgba(8,12,5,.62)); }
+  .ob-hero .chip{ position:relative; z-index:1; }
+  .ob-invite{ display:flex; align-items:center; gap:10px; background:var(--lime-50); border:1px solid var(--lime-300); border-radius:var(--radius-md); padding:11px 13px; font-size:12.5px; color:var(--ink-700); line-height:1.45; }
+  .ob-invite svg{ color:var(--lime-700); flex-shrink:0; }
+  .lang-list{ display:flex; flex-direction:column; gap:8px; }
+  .lang-opt{
+    display:flex; align-items:center; gap:12px; width:100%; font-family:inherit; cursor:pointer; text-align:left;
+    background:var(--surface); border:1.5px solid var(--border-default); border-radius:var(--radius-md); padding:13px 15px;
+    transition:border-color var(--duration-fast), background var(--duration-fast);
+  }
+  .lang-opt .lang-native{ font-size:15px; font-weight:700; color:var(--text-primary); }
+  .lang-opt .lang-en{ font-size:12px; color:var(--text-secondary); margin-top:1px; }
+  .lang-opt .lang-tick{ margin-left:auto; color:var(--accent-strong); opacity:0; flex-shrink:0; }
+  .lang-opt.is-selected{ border-color:var(--accent); background:var(--lime-50); }
+  .lang-opt.is-selected .lang-tick{ opacity:1; }
+  .screen-footer{ flex-shrink:0; background:var(--surface); border-top:1px solid var(--border-subtle); padding:12px 20px; }
+
+  /* ---- Home ---- */
+  #screen-home .scroll-body{ background:var(--bg-canvas); padding-top:6px; padding-bottom:20px; }
+  .farm-view{ position:relative; border-radius:var(--radius-xl); overflow:hidden; background-image:var(--tex-aerial-plots); background-size:cover; background-position:center; height:186px; }
+  .farm-view .fv-overlay{ position:absolute; inset:0; width:100%; height:100%; }
+  .farm-view .tag-float{ position:absolute; left:12px; bottom:12px; }
+  .farm-view .fv-expand{ position:absolute; right:12px; top:12px; }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; }
+
+  /* Big log task button — a voice button with a plus, per the flow map */
+  .log-hot-btn{
+    position:relative; width:100%; border:none; cursor:pointer; font-family:inherit;
+    background:var(--accent); color:var(--text-on-lime); border-radius:var(--radius-xl);
+    padding:18px 20px; display:flex; align-items:center; gap:14px; text-align:left;
+    box-shadow:var(--shadow-lime); transition:transform var(--duration-fast) var(--ease-standard), background var(--duration-fast);
+  }
+  .log-hot-btn:active{ transform:scale(.985); }
+  .log-hot-btn:hover{ background:var(--accent-strong); }
+  .log-hot-btn .hot-mic{ width:52px; height:52px; border-radius:50%; background:var(--ink-900); color:var(--neutral-000); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:relative; }
+  .log-hot-btn .hot-plus{ position:absolute; right:-3px; bottom:-3px; width:22px; height:22px; border-radius:50%; background:var(--neutral-000); color:var(--ink-900); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .log-hot-btn .hot-title{ font-size:17px; font-weight:700; letter-spacing:var(--tracking-tight); }
+  .log-hot-btn .hot-sub{ font-size:12.5px; font-weight:600; color:var(--ink-700); margin-top:2px; }
+
+  /* ---- Capture ---- */
+  #screen-capture{ background:var(--ink-900); }
+  .cap-stage{ flex:1; display:flex; flex-direction:column; min-height:0; }
+  .cap-view{ position:relative; flex:1; min-height:0; background-image:var(--tex-crop-closeup); background-size:cover; background-position:center; }
+  .cap-topbar{ position:absolute; top:0; left:0; right:0; z-index:3; display:flex; align-items:center; justify-content:space-between; padding:14px 16px; }
+  .cap-topbar .ct-title{ font-size:13px; font-weight:700; color:var(--neutral-000); background:rgba(0,0,0,.42); backdrop-filter:blur(6px); padding:6px 12px; border-radius:var(--radius-full); }
+  .cap-shot-preview{ position:absolute; left:50%; bottom:52px; transform:translateX(-50%); width:132px; height:78px; border-radius:var(--radius-sm); border:2px solid rgba(255,255,255,.85); background-image:var(--tex-crop-closeup); background-size:cover; background-position:30% 60%; box-shadow:var(--shadow-md); opacity:0; transition:opacity var(--duration-base); }
+  .cap-shot-preview.is-visible{ opacity:1; }
+  .lens-toggle{ position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:3; background:rgba(0,0,0,.45); backdrop-filter:blur(6px); }
+  .lens-toggle .pill-opt{ color:rgba(255,255,255,.72); white-space:nowrap; padding:8px 15px; }
+  .lens-toggle .pill-opt.is-active{ background:var(--accent); color:var(--text-on-lime); }
+
+  /* The record card is the .record-hero component, docked to the bottom of capture */
+  .cap-record{ flex-shrink:0; padding:10px 12px 22px; }
+  .cap-record .record-hero{ gap:9px; padding:16px var(--space-5) 14px; }
+  .cap-record .rh-wave{ height:44px; }
+  .rh-controls .ctl{ display:flex; flex-direction:column; align-items:center; gap:5px; }
+  .rh-controls .ctl-label{ font-size:10.5px; font-weight:700; color:var(--ink-600); }
+  .stop-square{ width:22px; height:22px; border-radius:5px; background:var(--neutral-000); }
+
+  /* ---- Processing ---- */
+  #screen-processing{ background:var(--bg-canvas); }
+  .proc-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:0 32px; text-align:center; }
+  .proc-ring{ width:88px; height:88px; border-radius:50%; background:var(--lime-100); display:flex; align-items:center; justify-content:center; color:var(--lime-700); font-size:34px; position:relative; }
+  .proc-ring::after{ content:''; position:absolute; inset:-6px; border-radius:50%; border:2.5px solid var(--accent); border-top-color:transparent; border-left-color:transparent; animation:terra-spin 1s linear infinite; }
+  @keyframes terra-spin{ to{ transform:rotate(360deg); } }
+  .proc-steps{ width:100%; display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+  .proc-step{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:11px 14px; font-size:13px; font-weight:600; color:var(--text-tertiary); text-align:left; transition:color var(--duration-base), border-color var(--duration-base); }
+  .proc-step .ps-dot{ width:18px; height:18px; border-radius:50%; background:var(--neutral-150); color:var(--neutral-000); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; transition:background var(--duration-base); }
+  .proc-step.is-done{ color:var(--text-primary); border-color:var(--lime-300); }
+  .proc-step.is-done .ps-dot{ background:var(--accent-strong); }
+
+  /* ---- Review ---- */
+  #screen-review .scroll-body{ background:var(--bg-canvas); padding-top:6px; padding-bottom:20px; }
+  .rev-topbar{ display:flex; align-items:center; gap:12px; padding:6px 20px 12px; flex-shrink:0; }
+  .rev-topbar .rt-title{ flex:1; font-size:16px; font-weight:700; }
+  .transcript-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .voice-mini-wave{ display:flex; align-items:center; gap:2.5px; height:26px; flex:1; }
+  .voice-mini-wave .b{ width:2.5px; border-radius:2px; background:var(--neutral-300); }
+  .voice-mini-wave .b.hi{ background:var(--lime-600); }
+  .transcript-block{ background:var(--surface-sunken); border-radius:var(--radius-md); padding:13px; }
+  .transcript-block blockquote{ font-size:13.5px; color:var(--ink-700); line-height:1.6; font-style:italic; margin:6px 0 0; }
+  .photos-row{ display:flex; align-items:center; gap:8px; margin-top:12px; }
+  .thumb-add{ width:60px; height:60px; border-radius:var(--radius-md); flex-shrink:0; background:var(--surface-sunken); border:1.5px dashed var(--border-default); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; font-family:inherit; }
+  .thumb-add:hover{ border-color:var(--accent); color:var(--lime-700); }
+  .sorted-row{ display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid var(--border-subtle); }
+  .sorted-row:last-child{ border-bottom:none; }
+  .sorted-thumb{ width:46px; height:46px; border-radius:var(--radius-md); flex-shrink:0; background-size:cover; background-position:center; position:relative; overflow:hidden; }
+  .sorted-thumb .pin{ position:absolute; top:50%; left:50%; transform:translate(-50%,-58%); color:var(--red-500); font-size:17px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  .sorted-tile{ width:46px; height:46px; border-radius:var(--radius-md); flex-shrink:0; background:var(--lime-100); color:var(--lime-700); display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .anara-note{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-tertiary); margin-top:2px; }
+  .anara-note svg{ color:var(--lime-600); }
+
+  /* ---- Saved ---- */
+  #screen-saved .scroll-body{ background:var(--surface); padding-top:10px; padding-bottom:24px; }
+  .routed-list{ background:var(--surface-sunken); border-radius:var(--radius-lg); padding:2px 14px; margin-top:20px; }
+  .routed-list .list-row{ padding:14px 0; border-bottom:1px solid var(--border-subtle); }
+  .routed-list .list-row:last-child{ border-bottom:none; }
+  .saved-btns{ margin-top:auto; display:flex; flex-direction:column; gap:6px; padding-top:20px; }
+
+  /* ---- Tasks / Profile / Anara ---- */
+  #screen-tasks .scroll-body,
+  #screen-profile .scroll-body,
+  #screen-anara .scroll-body{ background:var(--bg-canvas); padding-top:6px; padding-bottom:20px; }
+  .task-row{ display:flex; align-items:flex-start; gap:12px; }
+  .task-row .tr-info{ flex:1; min-width:0; }
+  .task-row .tr-title{ font-size:14px; font-weight:700; color:var(--text-primary); }
+  .task-row .tr-meta{ font-size:12px; color:var(--text-secondary); margin-top:3px; }
+  .profile-hero{ display:flex; align-items:center; gap:14px; }
+  .profile-hero .ph-name{ font-size:19px; font-weight:700; letter-spacing:var(--tracking-tight); }
+  .profile-hero .ph-role{ font-size:12.5px; color:var(--text-secondary); margin-top:2px; }
+  .stat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .stat-cell{ background:var(--surface-sunken); border-radius:var(--radius-md); padding:13px 10px; text-align:center; }
+  .stat-cell .sc-val{ font-size:21px; font-weight:700; letter-spacing:var(--tracking-tight); }
+  .stat-cell .sc-label{ font-size:10.5px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-top:3px; }
+  .anara-hero{ position:relative; border-radius:var(--radius-xl); overflow:hidden; padding:22px 20px; background:linear-gradient(165deg, var(--lime-50) 0%, var(--lime-300) 100%); }
+  .anara-hero::after{ content:''; position:absolute; inset:0; opacity:.28; pointer-events:none; background-image:var(--tex-topo); background-size:cover; background-position:20% 30%; }
+  .anara-hero > *{ position:relative; z-index:1; }
+  .anara-hero .ah-title{ font-size:22px; font-weight:700; letter-spacing:var(--tracking-tight); margin-top:12px; }
+  .anara-hero .ah-sub{ font-size:13px; color:var(--ink-600); line-height:1.55; margin-top:6px; }
+  .cap-list .list-row{ padding:13px 0; border-bottom:1px solid var(--border-subtle); }
+  .cap-list .list-row:last-child{ border-bottom:none; }
+
+  /* Tab bar sits on the surface, above the home indicator */
+  .tabbar{ flex-shrink:0; background:var(--surface); border-top:1px solid var(--border-subtle); padding-bottom:6px; }
+
+</style>
+</head>
+
+<body class="terra">
+
+<div class="stage">
+  <div class="panel">
+    <div class="brand-row"><div class="mark"><span></span></div><div class="brand-name">Terra</div></div>
+    <h1>Farm worker app</h1>
+    <p class="desc">The PalmTrack farm-worker flow — invite, onboarding, home, voice capture, Anara processing and log review — composed entirely from documented Terra components.</p>
+
+    <div class="group-label">Walk the flow</div>
+    <button class="jump-btn" data-jump="onboarding"><span class="num">①</span> Onboarding — language</button>
+    <button class="jump-btn" data-jump="home"><span class="num">②</span> Home page</button>
+    <button class="jump-btn" data-jump="capture"><span class="num">③</span> Capture — voice + camera</button>
+    <button class="jump-btn" data-jump="processing"><span class="num">④</span> Processing audio &amp; images</button>
+    <button class="jump-btn" data-jump="review"><span class="num">⑤</span> Transcript &amp; auto-sort</button>
+    <button class="jump-btn" data-jump="saved"><span class="num">⑥</span> Confirm &amp; save log</button>
+
+    <div class="group-label">Tabs</div>
+    <button class="jump-btn" data-jump="tasks"><span class="num">•</span> My tasks</button>
+    <button class="jump-btn" data-jump="profile"><span class="num">•</span> My profile</button>
+    <button class="jump-btn" data-jump="anara"><span class="num">•</span> Anara</button>
+
+    <div class="foot-hint">Tap the big log button on Home to walk the real capture flow. Every element maps to a class in the <a href="design-system/index.html">Terra Design System →</a></div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone-frame">
+      <div class="phone-screen" id="app">
+
+        <!-- ============================================================
+             ① ONBOARDING — opened from the manager's WhatsApp invite
+             ============================================================ -->
+        <section class="screen" id="screen-onboarding">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-onboarding">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px sb-pad">
+            <div class="ob-hero">
+              <span class="chip chip-lime"><svg class="icon"><use href="#i-sprout"/></svg> PalmTrack</span>
+            </div>
+
+            <div>
+              <div class="t-h2">Welcome, Rahul</div>
+              <p class="t-body" style="margin:6px 0 0;">Ramesh K. invited you to log work for <strong style="color:var(--text-primary);">Green Acres Estate</strong>.</p>
+            </div>
+
+            <div class="ob-invite">
+              <svg class="icon" style="font-size:17px;"><use href="#i-check"/></svg>
+              <span>Invite verified from <strong>+91 98765 43210</strong>. Your manager already added your name and number.</span>
+            </div>
+
+            <div>
+              <div class="t-label" style="margin-bottom:10px;">Choose your language</div>
+              <div class="lang-list" id="lang-list">
+                <button class="lang-opt is-selected" data-lang="en">
+                  <div><div class="lang-native">English</div><div class="lang-en">English</div></div>
+                  <svg class="icon lang-tick"><use href="#i-check"/></svg>
+                </button>
+                <button class="lang-opt" data-lang="hi">
+                  <div><div class="lang-native">हिन्दी</div><div class="lang-en">Hindi</div></div>
+                  <svg class="icon lang-tick"><use href="#i-check"/></svg>
+                </button>
+                <button class="lang-opt" data-lang="ta">
+                  <div><div class="lang-native">தமிழ்</div><div class="lang-en">Tamil</div></div>
+                  <svg class="icon lang-tick"><use href="#i-check"/></svg>
+                </button>
+                <button class="lang-opt" data-lang="ml">
+                  <div><div class="lang-native">മലയാളം</div><div class="lang-en">Malayalam</div></div>
+                  <svg class="icon lang-tick"><use href="#i-check"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <p class="t-caption" style="margin:0;">Anara will listen and reply in the language you pick. You can change it later in My profile.</p>
+          </div>
+
+          <div class="screen-footer">
+            <button class="btn btn-dark btn-block" data-go="home">Continue</button>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             ② HOME — welcome, farm view, big log task button
+             ============================================================ -->
+        <section class="screen is-active" id="screen-home">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-home">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px">
+            <div class="welcome-header" style="margin-top:4px;">
+              <div class="greet">Welcome<br>back, Rahul</div>
+              <div class="avatar" style="background-image:var(--tex-crop-closeup);"></div>
+            </div>
+
+            <!-- Farm view: a visual representation of the farm -->
+            <div>
+              <div class="section-head" style="margin-bottom:10px;">
+                <div class="t-label">Farm view — Green Acres</div>
+                <span class="chip"><svg class="icon"><use href="#i-locate-fixed"/></svg> Live</span>
+              </div>
+              <div class="farm-view">
+                <svg class="fv-overlay" viewBox="0 0 340 186" preserveAspectRatio="none" aria-hidden="true">
+                  <polygon points="24,30 150,18 168,86 40,104" fill="rgba(168,226,47,.20)" stroke="#A8E22F" stroke-width="2"/>
+                  <polygon points="176,20 312,34 300,96 182,88" fill="rgba(124,92,250,.16)" stroke="#7C5CFA" stroke-width="2"/>
+                  <polygon points="34,118 164,100 176,164 46,172" fill="rgba(255,255,255,.14)" stroke="rgba(255,255,255,.7)" stroke-width="2" stroke-dasharray="5 4"/>
+                  <circle cx="96" cy="62" r="6" fill="#A8E22F" stroke="#14150F" stroke-width="2"/>
+                </svg>
+                <button class="btn-icon btn-icon-glass btn-icon-sm fv-expand" aria-label="Expand farm map"><svg class="icon"><use href="#i-move"/></svg></button>
+                <div class="tag-float">
+                  <div class="tag-label">Section 1 · Corn</div>
+                  <div class="tag-values">18 ha <span class="sub">You are here</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Big log task button — voice button with a plus -->
+            <button class="log-hot-btn" data-go="capture">
+              <span class="hot-mic">
+                <svg class="icon"><use href="#i-mic"/></svg>
+                <span class="hot-plus"><svg class="icon"><use href="#i-plus"/></svg></span>
+              </span>
+              <span>
+                <span class="hot-title">Log a task</span>
+                <span class="hot-sub" style="display:block;">Hold the phone up and just talk</span>
+              </span>
+            </button>
+
+            <!-- Today's logs -->
+            <div>
+              <div class="section-head" style="margin-bottom:10px;">
+                <div class="t-label">Today's logs</div>
+                <button class="lr-action" data-tab="tasks">View all <svg class="icon"><use href="#i-chevron-right"/></svg></button>
+              </div>
+              <div class="card card-pad-sm list-row" style="margin-bottom:8px;">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-droplet"/></svg></div>
+                <div class="lr-info">
+                  <div class="lr-value">Irrigation check</div>
+                  <div class="lr-sub">Section 1 · Block A · 2h ago</div>
+                </div>
+                <span class="chip chip-lime">Saved</span>
+              </div>
+              <div class="card card-pad-sm list-row">
+                <div class="lr-tile" style="background:var(--violet-100); color:var(--violet-700);"><svg class="icon"><use href="#i-bug"/></svg></div>
+                <div class="lr-info">
+                  <div class="lr-value">Pest sighting</div>
+                  <div class="lr-sub">Section 2 · Yesterday</div>
+                </div>
+                <span class="chip">Synced</span>
+              </div>
+            </div>
+          </div>
+
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============================================================
+             ③ CAPTURE — voice recorder with camera + video below stop
+             ============================================================ -->
+        <section class="screen" id="screen-capture">
+          <div class="status-bar px on-dark" style="padding-top:16px;"><span class="t-mono-stat" id="time-capture">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="cap-stage">
+            <div class="cap-view">
+              <div class="cap-topbar">
+                <button class="btn-icon btn-icon-glass btn-icon-sm" data-go="home" aria-label="Cancel log"><svg class="icon"><use href="#i-x"/></svg></button>
+                <span class="ct-title">New log</span>
+                <button class="btn-icon btn-icon-glass btn-icon-sm" aria-label="Switch camera"><svg class="icon"><use href="#i-rotate-ccw"/></svg></button>
+              </div>
+
+              <div class="cap-shot-preview" id="shot-preview"></div>
+
+              <div class="pill-group lens-toggle">
+                <button class="pill-opt is-active" data-lens>Dual lens</button>
+                <button class="pill-opt" data-lens>Single lens</button>
+              </div>
+            </div>
+
+            <!-- .record-hero from the component library -->
+            <div class="cap-record">
+              <div class="record-hero">
+                <div class="rh-badge"><span class="rec-dot"></span> Recording</div>
+                <div class="rh-wave" id="cap-wave"></div>
+                <div class="rh-timer" id="cap-timer">0:12</div>
+
+                <div class="rh-controls">
+                  <!-- camera + video sit either side of the stop-voice button -->
+                  <div class="ctl">
+                    <button class="btn-icon btn-icon-white" id="btn-photo" aria-label="Take photo"><svg class="icon"><use href="#i-camera"/></svg></button>
+                    <span class="ctl-label">Photo</span>
+                  </div>
+                  <div class="ctl">
+                    <button class="btn-icon btn-icon-dark btn-icon-lg" id="btn-stop" aria-label="Stop recording"><span class="stop-square"></span></button>
+                    <span class="ctl-label">Stop</span>
+                  </div>
+                  <div class="ctl">
+                    <button class="btn-icon btn-icon-white" id="btn-video" aria-label="Record video"><svg class="icon"><use href="#i-images"/></svg></button>
+                    <span class="ctl-label">Video</span>
+                  </div>
+                </div>
+
+                <div class="rh-hint">Speak naturally — tap stop when you're done</div>
+                <div class="thumbs-row" id="cap-thumbs" style="justify-content:center;">
+                  <span class="thumbs-empty"><svg class="icon"><use href="#i-image"/></svg> No photos yet</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             ④ PROCESSING — Anara processes the audio and images
+             ============================================================ -->
+        <section class="screen" id="screen-processing">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-processing">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="proc-wrap">
+            <div class="proc-ring"><svg class="icon"><use href="#i-sparkles"/></svg></div>
+            <div>
+              <div class="t-h3">Anara is listening</div>
+              <p class="t-body" style="margin:6px 0 0;">Processing your voice note and photos.</p>
+            </div>
+            <div class="proc-steps">
+              <div class="proc-step" data-step="1"><span class="ps-dot"><svg class="icon"><use href="#i-check"/></svg></span> Transcribing the voice note</div>
+              <div class="proc-step" data-step="2"><span class="ps-dot"><svg class="icon"><use href="#i-check"/></svg></span> Reading the photos</div>
+              <div class="proc-step" data-step="3"><span class="ps-dot"><svg class="icon"><use href="#i-check"/></svg></span> Sorting location, tree and category</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             ⑤ REVIEW — transcript on top, thumbnails, auto-sorted fields
+             ============================================================ -->
+        <section class="screen" id="screen-review">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-review">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="rev-topbar">
+            <button class="btn-icon btn-icon-neutral btn-icon-sm" data-go="capture" aria-label="Back to capture"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+            <span class="rt-title">Review log</span>
+            <span class="chip chip-lime"><svg class="icon"><use href="#i-sparkles"/></svg> Anara</span>
+          </div>
+
+          <div class="scroll-body px">
+            <!-- Transcribed voice-to-text, with a speaker to listen back -->
+            <div class="card card-pad">
+              <div class="transcript-head">
+                <button class="btn-icon btn-icon-lime btn-icon-sm" id="btn-listen" aria-label="Listen to the recording"><svg class="icon"><use href="#i-volume-2"/></svg></button>
+                <div class="voice-mini-wave" id="rev-wave"></div>
+                <span class="t-caption t-mono-stat">0:42</span>
+              </div>
+              <div class="transcript-block">
+                <div class="t-eyebrow">Transcript · English</div>
+                <blockquote>“Finished spraying block A this morning. The leaves on the third row look a bit yellow near the tips, so I took two photos. Soil is still damp from yesterday's rain, no watering needed today.”</blockquote>
+              </div>
+
+              <!-- Images pulled in automatically as small thumbnails, with a plus -->
+              <div class="t-label" style="margin-top:16px;">Photos from this log</div>
+              <div class="photos-row">
+                <div class="thumb" style="background-image:var(--tex-crop-closeup); background-size:cover;"><button class="thumb-rm" aria-label="Remove photo"><svg class="icon"><use href="#i-x"/></svg></button></div>
+                <div class="thumb" style="background-image:var(--tex-corn-field); background-size:cover;"><button class="thumb-rm" aria-label="Remove photo"><svg class="icon"><use href="#i-x"/></svg></button></div>
+                <button class="thumb-add" id="btn-add-photo" aria-label="Add more photos"><svg class="icon"><use href="#i-plus"/></svg></button>
+                <span class="thumbs-count">2 photos</span>
+              </div>
+            </div>
+
+            <!-- Auto-sorted by Anara: location, tree, category of work -->
+            <div class="card card-pad">
+              <div class="t-label" style="margin-bottom:2px;">Sorted automatically</div>
+
+              <div class="sorted-row">
+                <div class="sorted-thumb" style="background-image:var(--tex-aerial-plots);"><span class="pin"><svg class="icon filled"><use href="#i-map-pin"/></svg></span></div>
+                <div class="lr-info">
+                  <div class="lr-label">Location</div>
+                  <div class="lr-value">Section 1 · Block A</div>
+                  <div class="anara-note"><svg class="icon"><use href="#i-locate-fixed"/></svg> Matched from GPS · ±4 m</div>
+                </div>
+                <button class="lr-action">Edit</button>
+              </div>
+
+              <div class="sorted-row">
+                <div class="sorted-tile"><svg class="icon"><use href="#i-sprout"/></svg></div>
+                <div class="lr-info">
+                  <div class="lr-label">Tree / crop</div>
+                  <div class="lr-value">Corn · Row 3</div>
+                  <div class="anara-note"><svg class="icon"><use href="#i-sparkles"/></svg> Recognised from your photos</div>
+                </div>
+                <button class="lr-action">Edit</button>
+              </div>
+
+              <div class="sorted-row">
+                <div class="sorted-tile" style="background:var(--violet-100); color:var(--violet-700);"><svg class="icon"><use href="#i-droplet"/></svg></div>
+                <div class="lr-info">
+                  <div class="lr-label">Category of work</div>
+                  <div class="lr-value">Spraying · Leaf inspection</div>
+                  <div class="anara-note"><svg class="icon"><use href="#i-sparkles"/></svg> Identified from voice and image</div>
+                </div>
+                <button class="lr-action">Edit</button>
+              </div>
+            </div>
+
+            <div class="note-row">
+              <svg class="icon"><use href="#i-notebook-pen"/></svg>
+              <input type="text" placeholder="Add a note for your manager (optional)">
+            </div>
+          </div>
+
+          <div class="screen-footer">
+            <button class="btn btn-lime btn-block" data-go="saved"><svg class="icon"><use href="#i-check"/></svg> Confirm &amp; save log</button>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             ⑥ SAVED
+             ============================================================ -->
+        <section class="screen" id="screen-saved">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-saved">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px">
+            <div class="success-ring"><span class="success-disc"><svg class="icon"><use href="#i-check"/></svg></span></div>
+            <div style="text-align:center;">
+              <div class="t-h2">Log saved</div>
+              <p class="t-body" style="margin:8px 0 0;">Anara filed it for you. Your manager can see it now.</p>
+            </div>
+
+            <div class="routed-list">
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
+                <div class="lr-info"><div class="lr-label">Filed under</div><div class="lr-value">Section 1 · Block A</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-sprout"/></svg></div>
+                <div class="lr-info"><div class="lr-label">Crop</div><div class="lr-value">Corn · Row 3</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
+                <div class="lr-info"><div class="lr-label">Category</div><div class="lr-value">Spraying · Leaf inspection</div></div>
+              </div>
+            </div>
+
+            <div class="saved-btns">
+              <button class="btn btn-dark btn-block" data-go="capture">Log another task</button>
+              <button class="btn btn-ghost btn-block" data-go="home">Back to home</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             TAB — MY TASKS
+             ============================================================ -->
+        <section class="screen" id="screen-tasks">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-tasks">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px">
+            <div class="t-h2" style="margin-top:4px;">My tasks</div>
+
+            <div class="pill-group pill-block">
+              <button class="pill-opt is-active">Today</button>
+              <button class="pill-opt">This week</button>
+              <button class="pill-opt">All</button>
+            </div>
+
+            <div class="t-label">Assigned to you</div>
+            <div class="card card-pad-sm task-row" style="margin-bottom:8px;">
+              <div class="lr-tile" style="background:var(--violet-100); color:var(--violet-700);"><svg class="icon"><use href="#i-bug"/></svg></div>
+              <div class="tr-info">
+                <div class="tr-title">Pest inspection — Section 2</div>
+                <div class="tr-meta">Due today · Block C</div>
+              </div>
+              <span class="chip">Pending</span>
+            </div>
+            <div class="card card-pad-sm task-row">
+              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-droplet"/></svg></div>
+              <div class="tr-info">
+                <div class="tr-title">Irrigation check — Section 3</div>
+                <div class="tr-meta">Due tomorrow · Block B</div>
+              </div>
+              <span class="chip">Pending</span>
+            </div>
+
+            <div class="t-label" style="margin-top:6px;">Logged by you</div>
+            <div class="card card-pad-sm task-row" style="margin-bottom:8px;">
+              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="tr-info">
+                <div class="tr-title">Spraying · Leaf inspection</div>
+                <div class="tr-meta">Section 1 · Block A · 9:41 AM</div>
+              </div>
+              <span class="chip chip-lime">Saved</span>
+            </div>
+            <div class="card card-pad-sm task-row" style="margin-bottom:8px;">
+              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="tr-info">
+                <div class="tr-title">Fertiliser application</div>
+                <div class="tr-meta">Section 3 · Block B · Yesterday</div>
+              </div>
+              <span class="chip chip-lime">Saved</span>
+            </div>
+            <div class="card card-pad-sm task-row">
+              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="tr-info">
+                <div class="tr-title">Soil moisture reading</div>
+                <div class="tr-meta">Section 1 · Block A · Yesterday</div>
+              </div>
+              <span class="chip chip-lime">Saved</span>
+            </div>
+          </div>
+
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============================================================
+             TAB — MY PROFILE
+             ============================================================ -->
+        <section class="screen" id="screen-profile">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-profile">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px">
+            <div class="t-h2" style="margin-top:4px;">My profile</div>
+
+            <div class="card card-pad profile-hero">
+              <div class="avatar" style="width:58px;height:58px;background-image:var(--tex-crop-closeup);"></div>
+              <div>
+                <div class="ph-name">Rahul Kumar</div>
+                <div class="ph-role">Farm worker · Green Acres Estate</div>
+              </div>
+            </div>
+
+            <div class="card card-pad">
+              <div class="t-label" style="margin-bottom:12px;">This month</div>
+              <div class="stat-grid">
+                <div class="stat-cell"><div class="sc-val t-mono-stat">47</div><div class="sc-label">Logs</div></div>
+                <div class="stat-cell"><div class="sc-val t-mono-stat">23</div><div class="sc-label">Tasks</div></div>
+                <div class="stat-cell"><div class="sc-val t-mono-stat">3</div><div class="sc-label">Sections</div></div>
+              </div>
+            </div>
+
+            <div class="card card-pad cap-list">
+              <div class="t-label" style="margin-bottom:2px;">Account</div>
+              <div class="list-row">
+                <div class="lr-info"><div class="lr-label">Phone</div><div class="lr-value">+91 98765 43210</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-info"><div class="lr-label">Language</div><div class="lr-value" id="profile-lang">English</div></div>
+                <button class="lr-action" data-go="onboarding">Change</button>
+              </div>
+              <div class="list-row">
+                <div class="lr-info"><div class="lr-label">Manager</div><div class="lr-value">Ramesh K.</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-info"><div class="lr-label">Assigned sections</div><div class="lr-value">Section 1, 2, 3</div></div>
+              </div>
+            </div>
+
+            <button class="btn btn-white btn-block">Sign out</button>
+          </div>
+
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+
+        <!-- ============================================================
+             TAB — ANARA
+             ============================================================ -->
+        <section class="screen" id="screen-anara">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-anara">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+
+          <div class="scroll-body px">
+            <div class="anara-hero">
+              <span class="chip"><svg class="icon"><use href="#i-sparkles"/></svg> Always on</span>
+              <div class="ah-title">Anara</div>
+              <div class="ah-sub">Talk, snap a photo, and Anara does the paperwork — transcribing, sorting and filing every log for you.</div>
+            </div>
+
+            <div class="card card-pad cap-list">
+              <div class="t-label" style="margin-bottom:2px;">What Anara does for each log</div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-mic"/></svg></div>
+                <div class="lr-info"><div class="lr-value">Transcribes your voice</div><div class="lr-sub">In your chosen language, word for word</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-image"/></svg></div>
+                <div class="lr-info"><div class="lr-value">Reads your photos</div><div class="lr-sub">Spots the crop, the row and the problem</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
+                <div class="lr-info"><div class="lr-value">Sorts the location</div><div class="lr-sub">Matches GPS to the right section and block</div></div>
+              </div>
+              <div class="list-row">
+                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
+                <div class="lr-info"><div class="lr-value">Picks the category</div><div class="lr-sub">Identified from your voice and images together</div></div>
+              </div>
+            </div>
+
+            <div class="state-panel">
+              <span class="sp-icon"><svg class="icon"><use href="#i-info"/></svg></span>
+              <div class="sp-title">You always get the last word</div>
+              <div class="sp-desc">Every field Anara fills in is editable on the review screen before you save.</div>
+              <button class="btn btn-lime btn-sm" data-go="capture">Start a log</button>
+            </div>
+          </div>
+
+          <nav class="tabbar" data-tabbar></nav>
+        </section>
+        <!-- @app-end -->
+
+      </div>
+    </div>
+    <div class="phone-caption">Tap the big log button on Home to walk the flow</div>
+  </div>
+</div>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7" /> <path d="M19 12H5" /></symbol>
+<symbol id="i-battery-full" viewBox="0 0 24 24"><path d="M10 10v4" /> <path d="M14 10v4" /> <path d="M22 14v-4" /> <path d="M6 10v4" /> <rect x="2" y="6" width="16" height="12" rx="2" /></symbol>
+<symbol id="i-bug" viewBox="0 0 24 24"><path d="M12 20v-9" /> <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" /> <path d="M14.12 3.88 16 2" /> <path d="M21 21a4 4 0 0 0-3.81-4" /> <path d="M21 5a4 4 0 0 1-3.55 3.97" /> <path d="M22 13h-4" /> <path d="M3 21a4 4 0 0 1 3.81-4" /> <path d="M3 5a4 4 0 0 0 3.55 3.97" /> <path d="M6 13H2" /> <path d="m8 2 1.88 1.88" /> <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" /></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /> <circle cx="12" cy="13" r="3" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+<symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="m9 14 2 2 4-4" /></symbol>
+<symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" /></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></symbol>
+<symbol id="i-images" viewBox="0 0 24 24"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16" /> <path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2" /> <circle cx="13" cy="7" r="1" fill="currentColor" /> <rect x="8" y="2" width="14" height="14" rx="2" /></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol>
+<symbol id="i-locate-fixed" viewBox="0 0 24 24"><line x1="2" x2="5" y1="12" y2="12" /> <line x1="19" x2="22" y1="12" y2="12" /> <line x1="12" x2="12" y1="2" y2="5" /> <line x1="12" x2="12" y1="19" y2="22" /> <circle cx="12" cy="12" r="7" /> <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 19v3" /> <path d="M19 10v2a7 7 0 0 1-14 0v-2" /> <rect x="9" y="2" width="6" height="13" rx="3" /></symbol>
+<symbol id="i-move" viewBox="0 0 24 24"><path d="M12 2v20" /> <path d="m15 19-3 3-3-3" /> <path d="m19 9 3 3-3 3" /> <path d="M2 12h20" /> <path d="m5 9-3 3 3 3" /> <path d="m9 5 3-3 3 3" /></symbol>
+<symbol id="i-notebook-pen" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" /> <path d="M2 6h4" /> <path d="M2 10h4" /> <path d="M2 14h4" /> <path d="M2 18h4" /> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
+<symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><path d="M2 20h.01" /> <path d="M7 20v-4" /> <path d="M12 20v-8" /> <path d="M17 20V8" /> <path d="M22 4v16" /></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /></symbol>
+<symbol id="i-sprout" viewBox="0 0 24 24"><path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3" /> <path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4" /> <path d="M5 21h14" /></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /> <circle cx="12" cy="7" r="4" /></symbol>
+<symbol id="i-volume-2" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" /> <path d="M16 9a5 5 0 0 1 0 6" /> <path d="M19.364 18.364a9 9 0 0 0 0-12.728" /></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01" /> <path d="M2 8.82a15 15 0 0 1 20 0" /> <path d="M5 12.859a10 10 0 0 1 14 0" /> <path d="M8.5 16.429a5 5 0 0 1 7 0" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+</svg>
+
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- Tab bar: the four destinations from the flow map ---------- */
+  var TABS = [
+    { id:'home',    label:'Home',       icon:'i-house' },
+    { id:'tasks',   label:'My tasks',   icon:'i-clipboard-check' },
+    { id:'profile', label:'My profile', icon:'i-user' },
+    { id:'anara',   label:'Anara',      icon:'i-sparkles' }
+  ];
+
+  document.querySelectorAll('[data-tabbar]').forEach(function(bar){
+    bar.innerHTML = TABS.map(function(t){
+      return '<button class="tab" data-tab="' + t.id + '">' +
+               '<span class="ti"><svg class="icon"><use href="#' + t.icon + '"/></svg></span>' +
+               '<span>' + t.label + '</span>' +
+             '</button>';
+    }).join('');
+  });
+
+  /* ---------- Screen routing ---------- */
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  var jumps = Array.prototype.slice.call(document.querySelectorAll('.jump-btn'));
+  var current = 'home';
+
+  function show(id){
+    var target = document.getElementById('screen-' + id);
+    if(!target) return;
+    current = id;
+
+    screens.forEach(function(s){ s.classList.toggle('is-active', s === target); });
+    target.querySelectorAll('.scroll-body').forEach(function(b){ b.scrollTop = 0; });
+
+    // Mirror the active tab into every tab bar so it survives screen swaps
+    document.querySelectorAll('.tabbar .tab').forEach(function(tab){
+      tab.classList.toggle('is-active', tab.dataset.tab === id);
+    });
+    jumps.forEach(function(j){ j.classList.toggle('is-current', j.dataset.jump === id); });
+
+    if(id === 'capture') startCapture();
+    if(id === 'processing') runProcessing();
+  }
+
+  document.addEventListener('click', function(e){
+    var goEl = e.target.closest('[data-go]');
+    if(goEl){ show(goEl.dataset.go); return; }
+
+    var tabEl = e.target.closest('[data-tab]');
+    if(tabEl){ show(tabEl.dataset.tab); return; }
+
+    var jumpEl = e.target.closest('[data-jump]');
+    if(jumpEl){ show(jumpEl.dataset.jump); return; }
+  });
+
+  /* ---------- Onboarding: language choice ---------- */
+  document.getElementById('lang-list').addEventListener('click', function(e){
+    var opt = e.target.closest('.lang-opt');
+    if(!opt) return;
+    this.querySelectorAll('.lang-opt').forEach(function(o){ o.classList.remove('is-selected'); });
+    opt.classList.add('is-selected');
+    document.getElementById('profile-lang').textContent = opt.querySelector('.lang-en').textContent;
+  });
+
+  /* ---------- Capture: waveform, timer, photo capture ---------- */
+  var wave = document.getElementById('cap-wave');
+  var timerEl = document.getElementById('cap-timer');
+  var thumbsEl = document.getElementById('cap-thumbs');
+  var preview = document.getElementById('shot-preview');
+  var BARS = 34, TEXTURES = ['--tex-crop-closeup','--tex-corn-field','--tex-empty-field'];
+  var waveTimer = null, tickTimer = null, seconds = 0, shots = 0;
+
+  for(var i = 0; i < BARS; i++){
+    var b = document.createElement('span');
+    b.className = 'b';
+    b.style.animationDelay = (i * 45) + 'ms';
+    wave.appendChild(b);
+  }
+  var bars = wave.querySelectorAll('.b');
+
+  function paintWave(){
+    bars.forEach(function(b){ b.style.height = (18 + Math.random() * 82) + '%'; });
+  }
+
+  function fmt(s){ return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+
+  function startCapture(){
+    stopCapture();
+    seconds = 12; shots = 0;
+    timerEl.textContent = fmt(seconds);
+    thumbsEl.innerHTML = '<span class="thumbs-empty"><svg class="icon"><use href="#i-image"/></svg> No photos yet</span>';
+    preview.classList.remove('is-visible');
+    paintWave();
+    waveTimer = setInterval(paintWave, 180);
+    tickTimer = setInterval(function(){ seconds++; timerEl.textContent = fmt(seconds); }, 1000);
+  }
+
+  function stopCapture(){
+    clearInterval(waveTimer); waveTimer = null;
+    clearInterval(tickTimer); tickTimer = null;
+  }
+
+  function addShot(isVideo){
+    shots++;
+    if(shots === 1) thumbsEl.innerHTML = '';
+
+    var t = document.createElement('div');
+    t.className = 'thumb' + (isVideo ? ' is-video' : '');
+    if(!isVideo){
+      t.style.backgroundImage = 'var(' + TEXTURES[(shots - 1) % TEXTURES.length] + ')';
+      t.style.backgroundSize = 'cover';
+      t.style.backgroundPosition = 'center';
+    } else {
+      t.innerHTML = '<span class="thumb-dur">0:08</span>';
+    }
+    t.style.width = '46px'; t.style.height = '46px';
+    thumbsEl.appendChild(t);
+
+    var count = thumbsEl.querySelector('.thumbs-count');
+    if(!count){
+      count = document.createElement('span');
+      count.className = 'thumbs-count';
+      thumbsEl.appendChild(count);
+    } else {
+      thumbsEl.appendChild(count);
+    }
+    count.textContent = shots + (shots === 1 ? ' capture' : ' captures');
+
+    preview.classList.add('is-visible');
+    setTimeout(function(){ preview.classList.remove('is-visible'); }, 900);
+  }
+
+  document.getElementById('btn-photo').addEventListener('click', function(){ addShot(false); });
+  document.getElementById('btn-video').addEventListener('click', function(){ addShot(true); });
+  document.getElementById('btn-stop').addEventListener('click', function(){
+    stopCapture();
+    show('processing');
+  });
+
+  document.querySelectorAll('[data-lens]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('[data-lens]').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+    });
+  });
+
+  /* ---------- Processing: step through, then land on review ---------- */
+  var procTimers = [];
+
+  function runProcessing(){
+    procTimers.forEach(clearTimeout);
+    procTimers = [];
+
+    var steps = document.querySelectorAll('.proc-step');
+    steps.forEach(function(s){ s.classList.remove('is-done'); });
+
+    steps.forEach(function(s, i){
+      procTimers.push(setTimeout(function(){ s.classList.add('is-done'); }, 700 + i * 750));
+    });
+    procTimers.push(setTimeout(function(){
+      if(current === 'processing') show('review');
+    }, 700 + steps.length * 750 + 500));
+  }
+
+  /* ---------- Review: static playback waveform ---------- */
+  var revWave = document.getElementById('rev-wave');
+  for(var j = 0; j < 46; j++){
+    var rb = document.createElement('span');
+    rb.className = 'b' + (j < 16 ? ' hi' : '');
+    rb.style.height = (22 + Math.abs(Math.sin(j * 0.7)) * 78) + '%';
+    revWave.appendChild(rb);
+  }
+
+  document.getElementById('btn-listen').addEventListener('click', function(){
+    var rbs = revWave.querySelectorAll('.b');
+    rbs.forEach(function(b, i){
+      b.classList.remove('hi');
+      setTimeout(function(){ b.classList.add('hi'); }, i * 26);
+    });
+  });
+
+  document.getElementById('btn-add-photo').addEventListener('click', function(){
+    var row = this.parentNode;
+    var t = document.createElement('div');
+    t.className = 'thumb';
+    t.style.backgroundImage = 'var(--tex-empty-field)';
+    t.style.backgroundSize = 'cover';
+    t.innerHTML = '<button class="thumb-rm" aria-label="Remove photo"><svg class="icon"><use href="#i-x"/></svg></button>';
+    row.insertBefore(t, this);
+
+    var count = row.querySelector('.thumbs-count');
+    count.textContent = row.querySelectorAll('.thumb').length + ' photos';
+  });
+
+  document.addEventListener('click', function(e){
+    var rm = e.target.closest('.thumb-rm');
+    if(!rm) return;
+    var row = rm.closest('.photos-row');
+    rm.closest('.thumb').remove();
+    if(row){
+      var n = row.querySelectorAll('.thumb').length;
+      row.querySelector('.thumbs-count').textContent = n + (n === 1 ? ' photo' : ' photos');
+    }
+  });
+
+  /* ---------- Live clock in every status bar ---------- */
+  function tickClock(){
+    var now = new Date();
+    var h = now.getHours() % 12 || 12;
+    var label = h + ':' + String(now.getMinutes()).padStart(2, '0');
+    document.querySelectorAll('.status-bar .t-mono-stat').forEach(function(el){ el.textContent = label; });
+  }
+  tickClock();
+  setInterval(tickClock, 20000);
+
+  show('home');
+})();
+</script>
+
+</div>
+
+</body></html>

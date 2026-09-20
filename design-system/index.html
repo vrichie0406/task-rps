@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Terra Design System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Terra — the design system and component library for the precision-agriculture product suite.">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="textures.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{ margin:0; background:var(--bg-app); }
+
+  .shell{ display:flex; min-height:100vh; }
+
+  /* ---- Sidebar ---- */
+  .sidenav{
+    width:248px; flex-shrink:0; position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:28px 18px; border-right:1px solid var(--border-subtle);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; margin-bottom:28px; padding:0 8px; }
+  .brand .mark{ width:30px; height:30px; border-radius:9px; background:var(--ink-900); display:flex; align-items:center; justify-content:center; }
+  .brand .mark span{ width:12px; height:12px; border-radius:3px; background:var(--accent); display:block; }
+  .brand .name{ font-weight:700; font-size:15.5px; letter-spacing:var(--tracking-tight); }
+  .brand .tag{ font-size:10.5px; color:var(--text-tertiary); font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
+
+  .nav-group{ margin-bottom:6px; }
+  .nav-group-label{ font-size:10.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-tertiary); padding:14px 10px 6px; }
+  .nav-link{
+    display:block; padding:8px 10px; border-radius:9px; font-size:13.5px; font-weight:600;
+    color:var(--text-secondary); text-decoration:none; margin-bottom:1px;
+  }
+  .nav-link:hover{ background:var(--neutral-100); color:var(--text-primary); }
+
+  .nav-foot{ margin-top:20px; padding:14px 10px 4px; border-top:1px solid var(--border-subtle); }
+  .nav-foot a{ display:flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; color:var(--text-link); text-decoration:none; margin-bottom:8px; }
+
+  /* ---- Main ---- */
+  .main{ flex:1; min-width:0; padding:44px 56px 120px; max-width:1180px; }
+  .page-head{ margin-bottom:56px; }
+  .page-head .eyebrow{ color:var(--accent-strong); }
+  .page-head h1{ font-size:44px; font-weight:700; letter-spacing:var(--tracking-tight); margin:10px 0 14px; line-height:1.08; }
+  .page-head p{ font-size:16px; color:var(--text-secondary); max-width:640px; line-height:1.6; }
+  .page-head .meta-row{ display:flex; gap:10px; margin-top:22px; }
+
+  section.doc-section{ margin-bottom:64px; scroll-margin-top:24px; }
+  .sec-head{ margin-bottom:20px; }
+  .sec-head h2{ font-size:24px; font-weight:700; letter-spacing:var(--tracking-tight); margin-bottom:6px; }
+  .sec-head p{ font-size:14px; color:var(--text-secondary); max-width:620px; line-height:1.6; }
+
+  .preview{
+    background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:20px;
+    padding:36px; margin-bottom:14px;
+  }
+  .preview-row{ display:flex; flex-wrap:wrap; gap:18px; align-items:flex-start; }
+  .preview-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:10px; }
+
+  .spec-code{
+    background:var(--ink-900); color:#D3F79B; border-radius:12px; padding:14px 18px; font-size:12.5px;
+    font-family:'SF Mono', 'Fira Code', Menlo, Consolas, monospace; overflow-x:auto; line-height:1.7;
+  }
+  .spec-code .tag{ color:#8FB2FF; }
+  .spec-code .cls{ color:#D3F79B; }
+
+  /* Usage rule that sits under a spec — when to reach for a variant, and why */
+  .note{
+    margin-top:12px; padding:13px 16px; border-left:3px solid var(--accent);
+    background:var(--surface); border-radius:0 12px 12px 0;
+    font-size:13px; color:var(--text-secondary); line-height:1.65; max-width:760px;
+  }
+  .note code, .sec-head code{
+    font-family:'SF Mono', 'Fira Code', Menlo, Consolas, monospace; font-size:12px;
+    background:var(--neutral-100); color:var(--ink-700); padding:1px 5px; border-radius:5px;
+  }
+
+  /* swatches */
+  .swatch-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:14px; }
+  .swatch{ border-radius:14px; overflow:hidden; border:1px solid var(--border-subtle); }
+  .swatch .fill{ height:64px; }
+  .swatch .info{ background:var(--surface); padding:10px 12px; }
+  .swatch .info .n{ font-size:12.5px; font-weight:700; }
+  .swatch .info .h{ font-size:11px; color:var(--text-tertiary); font-family:monospace; margin-top:1px; }
+
+  .type-row{ display:flex; align-items:baseline; gap:20px; padding:16px 0; border-bottom:1px solid var(--border-subtle); }
+  .type-row:last-child{ border-bottom:none; }
+  .type-row .tname{ width:150px; flex-shrink:0; font-size:11px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.05em; }
+
+  .token-table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  .token-table th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); padding:8px 14px; border-bottom:1px solid var(--border-default); }
+  .token-table td{ padding:11px 14px; border-bottom:1px solid var(--border-subtle); }
+  .token-table tr:last-child td{ border-bottom:none; }
+  .token-table code{ font-family:monospace; background:var(--neutral-100); padding:2px 6px; border-radius:5px; font-size:12px; }
+  .swatch-dot{ display:inline-block; width:14px; height:14px; border-radius:4px; margin-right:8px; vertical-align:-2px; border:1px solid var(--border-subtle); }
+
+  .radius-demo{ width:64px; height:64px; background:var(--accent); }
+  .shadow-demo{ width:110px; height:74px; background:var(--surface); border-radius:16px; }
+
+  .component-index{ display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:10px; margin-top:8px; }
+  .component-index a{
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+    background:var(--surface); border:1px solid var(--border-subtle); border-radius:12px; padding:14px 16px;
+    text-decoration:none; color:var(--text-primary); font-weight:700; font-size:13.5px;
+  }
+  .component-index a:hover{ border-color:var(--accent); }
+  .component-index a span.n{ color:var(--text-tertiary); font-weight:600; }
+
+  @media (max-width: 860px){
+    .sidenav{ display:none; }
+    .main{ padding:32px 20px 100px; }
+  }
+</style>
+</head>
+
+<body class="terra">
+
+<div class="shell">
+  <nav class="sidenav">
+    <div class="brand">
+      <div class="mark"><span></span></div>
+      <div>
+        <div class="name">Terra</div>
+        <div class="tag">Design system</div>
+      </div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Foundations</div>
+      <a class="nav-link" href="#overview">Overview</a>
+      <a class="nav-link" href="#color">Color</a>
+      <a class="nav-link" href="#typography">Typography</a>
+      <a class="nav-link" href="#spacing">Spacing &amp; radius</a>
+      <a class="nav-link" href="#elevation">Elevation</a>
+      <a class="nav-link" href="#texture">Photography &amp; pattern</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Actions</div>
+      <a class="nav-link" href="#buttons">Buttons</a>
+      <a class="nav-link" href="#segmented">Segmented controls</a>
+      <a class="nav-link" href="#chips">Chips &amp; tags</a>
+      <a class="nav-link" href="#forms">Form fields</a>
+      <a class="nav-link" href="#list-row">List row</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Cards</div>
+      <a class="nav-link" href="#field-card">Field card</a>
+      <a class="nav-link" href="#weather-card">Weather card</a>
+      <a class="nav-link" href="#zone-card">Zone rate card</a>
+      <a class="nav-link" href="#stat-panel">Stat photo panel</a>
+      <a class="nav-link" href="#map-card">Map zone card</a>
+      <a class="nav-link" href="#chart-card">Growth chart card</a>
+      <a class="nav-link" href="#promo">Promo &amp; hero cards</a>
+      <a class="nav-link" href="#cta-rail">CTA rail</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Capture flow</div>
+      <a class="nav-link" href="#record-hero">Record hero</a>
+      <a class="nav-link" href="#viewfinder">Viewfinder</a>
+      <a class="nav-link" href="#thumbnails">Thumbnails</a>
+      <a class="nav-link" href="#map-full">Full-screen map</a>
+    </div>
+    <div class="nav-group">
+      <div class="nav-group-label">Navigation</div>
+      <a class="nav-link" href="#statusbar">Status bar</a>
+      <a class="nav-link" href="#topbar">Mobile topbar</a>
+      <a class="nav-link" href="#welcome">Welcome header</a>
+      <a class="nav-link" href="#tabbar">Tab bar</a>
+    </div>
+
+    <div class="nav-foot">
+      <a href="../capture-flow.html">→ Capture flow prototype</a>
+      <a href="https://github.com/vrichie0406/task-rps" target="_blank" rel="noopener">→ Source on GitHub</a>
+    </div>
+  </nav>
+
+  <main class="main">
+    <header class="page-head" id="overview">
+      <div class="t-eyebrow">Version 1.0 · Component library</div>
+      <h1>Terra Design System</h1>
+      <p>Terra is the shared visual language for the field-operations product suite — a light, warm-neutral UI built around one accent (lime) and real field photography. Screens live on paper-white and soft grey-green grounds; ink is reserved for small high-contrast moments — a primary button, a circular action — and for text set over imagery. Every screen is composed exclusively from the tokens and components documented here, so design and implementation never drift apart.</p>
+      <div class="meta-row">
+        <span class="chip chip-lime">53 icons</span>
+        <span class="chip">24 components</span>
+        <span class="chip">Light-only palette</span>
+      </div>
+    </header>
+
+    <section class="doc-section">
+      <div class="sec-head"><h2>What's in the library</h2><p>Jump straight to any component. Every card below links to its live, rendered spec further down the page.</p></div>
+      <div class="component-index">
+        <a href="#field-card">Field card <span class="n">01</span></a>
+        <a href="#weather-card">Weather card <span class="n">02</span></a>
+        <a href="#zone-card">Zone rate card <span class="n">03</span></a>
+        <a href="#stat-panel">Stat photo panel <span class="n">04</span></a>
+        <a href="#map-card">Map zone card <span class="n">05</span></a>
+        <a href="#chart-card">Growth chart card <span class="n">06</span></a>
+        <a href="#promo">Promo &amp; hero cards <span class="n">07</span></a>
+        <a href="#cta-rail">CTA rail <span class="n">08</span></a>
+        <a href="#buttons">Buttons <span class="n">09</span></a>
+        <a href="#segmented">Segmented controls <span class="n">10</span></a>
+        <a href="#chips">Chips &amp; tags <span class="n">11</span></a>
+        <a href="#forms">Form fields <span class="n">12</span></a>
+        <a href="#statusbar">Status bar <span class="n">13</span></a>
+        <a href="#topbar">Mobile topbar <span class="n">14</span></a>
+        <a href="#welcome">Welcome header <span class="n">15</span></a>
+        <a href="#tabbar">Tab bar <span class="n">16</span></a>
+      </div>
+    </section>
+
+    <!-- ===================== COLOR ===================== -->
+    <section class="doc-section" id="color">
+      <div class="sec-head"><h2>Color</h2><p>One accent, a warm-neutral ink/paper scale, a violet family reserved for productivity-zone data visualization, and a warm red for destructive actions.</p></div>
+
+      <div class="preview-label">Accent — Lime</div>
+      <div class="swatch-grid" style="margin-bottom:22px;">
+        <div class="swatch"><div class="fill" style="background:var(--lime-100)"></div><div class="info"><div class="n">Lime 100</div><div class="h">#E8F9BE</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--lime-300)"></div><div class="info"><div class="n">Lime 300</div><div class="h">#C8EE72</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--lime-500)"></div><div class="info"><div class="n">Lime 500 · Accent</div><div class="h">#A8E22F</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--lime-600)"></div><div class="info"><div class="n">Lime 600</div><div class="h">#8FC922</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--lime-700)"></div><div class="info"><div class="n">Lime 700</div><div class="h">#6E9C1B</div></div></div>
+      </div>
+
+      <div class="preview-label">Ink — text &amp; dark surfaces</div>
+      <div class="swatch-grid" style="margin-bottom:22px;">
+        <div class="swatch"><div class="fill" style="background:var(--ink-900)"></div><div class="info"><div class="n">Ink 900</div><div class="h">#14150F</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--ink-700)"></div><div class="info"><div class="n">Ink 700</div><div class="h">#2B2F23</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--ink-500)"></div><div class="info"><div class="n">Ink 500</div><div class="h">#666B5B</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--ink-400)"></div><div class="info"><div class="n">Ink 400</div><div class="h">#8A8F80</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--ink-300)"></div><div class="info"><div class="n">Ink 300</div><div class="h">#AFB4A5</div></div></div>
+      </div>
+
+      <div class="preview-label">Neutral — paper &amp; surfaces</div>
+      <div class="swatch-grid" style="margin-bottom:22px;">
+        <div class="swatch"><div class="fill" style="background:var(--neutral-000); border-bottom:1px solid var(--border-subtle);"></div><div class="info"><div class="n">Neutral 000</div><div class="h">#FFFFFF</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-50)"></div><div class="info"><div class="n">Neutral 50</div><div class="h">#F4F5F2</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-100)"></div><div class="info"><div class="n">Neutral 100</div><div class="h">#E9EBE5</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-200)"></div><div class="info"><div class="n">Neutral 200</div><div class="h">#D7DAD0</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-300)"></div><div class="info"><div class="n">Neutral 300</div><div class="h">#C2C6B9</div></div></div>
+      </div>
+
+      <div class="preview-label">Data · productivity zones</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="fill" style="background:var(--zone-very-high)"></div><div class="info"><div class="n">Very high</div><div class="h">#5A3FC0</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--zone-high)"></div><div class="info"><div class="n">High</div><div class="h">#7C5CFA</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--zone-average)"></div><div class="info"><div class="n">Average</div><div class="h">#C6B8FA</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--zone-low); border-bottom:1px solid var(--border-subtle);"></div><div class="info"><div class="n">Low</div><div class="h">#D7DAD0</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--red-500)"></div><div class="info"><div class="n">Live / alert</div><div class="h">#E5484D</div></div></div>
+      </div>
+
+      <div class="preview-label" style="margin-top:22px;">Danger — destructive actions</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="fill" style="background:var(--red-50); border-bottom:1px solid var(--border-subtle);"></div><div class="info"><div class="n">Red 50 · soft</div><div class="h">#FEF3F3</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--red-100)"></div><div class="info"><div class="n">Red 100</div><div class="h">#FBDFE0</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--red-300)"></div><div class="info"><div class="n">Red 300 · border</div><div class="h">#F3A3A5</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--red-600)"></div><div class="info"><div class="n">Red 600 · Danger</div><div class="h">#CC3238</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--red-700)"></div><div class="info"><div class="n">Red 700 · strong</div><div class="h">#A6262C</div></div></div>
+      </div>
+      <div class="note">Red plays two separate parts. <code>--red-500</code> is a <em>signal</em> — the recording dot, a live badge — where nothing sits on top of it. <code>--danger</code> (<code>--red-600</code>) is the <em>action</em> colour, one step darker so white button text clears AA. Reaching for red-500 on a button is the mistake this split exists to prevent.</div>
+    </section>
+
+    <!-- ===================== TYPOGRAPHY ===================== -->
+    <section class="doc-section" id="typography">
+      <div class="sec-head"><h2>Typography</h2><p>A single grotesk family carries the whole system — tight tracking on display sizes, generous line-height in body copy.</p></div>
+      <div class="preview">
+        <div class="type-row"><div class="tname">Display / 48</div><div class="t-display">+16° Vynnyky</div></div>
+        <div class="type-row"><div class="tname">H1 / 36</div><div class="t-h1">Boost agriculture production</div></div>
+        <div class="type-row"><div class="tname">H2 / 28</div><div class="t-h2">93% of reference value</div></div>
+        <div class="type-row"><div class="tname">H3 / 21</div><div class="t-h3">Growth rate</div></div>
+        <div class="type-row"><div class="tname">Title / 17</div><div class="t-title">Corn field · 18 ha</div></div>
+        <div class="type-row"><div class="tname">Body / 15</div><div class="t-body">Ensuring efficient resource utilization and improved crop yields across every zone.</div></div>
+        <div class="type-row"><div class="tname">Label / 12</div><div class="t-label">Standard rate</div></div>
+        <div class="type-row"><div class="tname">Caption / 13</div><div class="t-caption">Humidity · 74%</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== SPACING/RADIUS ===================== -->
+    <section class="doc-section" id="spacing">
+      <div class="sec-head"><h2>Spacing &amp; radius</h2><p>A 4px spacing rhythm and four radius steps, from tight controls to full-bleed hero cards.</p></div>
+      <div class="preview">
+        <table class="token-table">
+          <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+          <tr><td><code>--radius-sm</code></td><td>8px</td><td>chips, small badges</td></tr>
+          <tr><td><code>--radius-md</code></td><td>14px</td><td>inputs, zone rows, tiles</td></tr>
+          <tr><td><code>--radius-lg</code></td><td>20px</td><td>cards, field photos</td></tr>
+          <tr><td><code>--radius-xl</code></td><td>28px</td><td>stat panels, hero cards</td></tr>
+          <tr><td><code>--radius-full</code></td><td>999px</td><td>buttons, pills, avatars</td></tr>
+        </table>
+      </div>
+      <div class="preview preview-row">
+        <div style="text-align:center;"><div class="radius-demo" style="border-radius:var(--radius-sm)"></div><div class="preview-label" style="margin-top:8px;">sm</div></div>
+        <div style="text-align:center;"><div class="radius-demo" style="border-radius:var(--radius-md)"></div><div class="preview-label" style="margin-top:8px;">md</div></div>
+        <div style="text-align:center;"><div class="radius-demo" style="border-radius:var(--radius-lg)"></div><div class="preview-label" style="margin-top:8px;">lg</div></div>
+        <div style="text-align:center;"><div class="radius-demo" style="border-radius:var(--radius-xl)"></div><div class="preview-label" style="margin-top:8px;">xl</div></div>
+        <div style="text-align:center;"><div class="radius-demo" style="border-radius:var(--radius-full)"></div><div class="preview-label" style="margin-top:8px;">full</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== ELEVATION ===================== -->
+    <section class="doc-section" id="elevation">
+      <div class="sec-head"><h2>Elevation</h2><p>Shadows stay soft and warm — never a cold drop shadow.</p></div>
+      <div class="preview preview-row">
+        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-sm)"></div><div class="preview-label" style="margin-top:10px;">sm</div></div>
+        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-md)"></div><div class="preview-label" style="margin-top:10px;">md</div></div>
+        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-lg)"></div><div class="preview-label" style="margin-top:10px;">lg</div></div>
+        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-lime); background:var(--accent);"></div><div class="preview-label" style="margin-top:10px;">lime (CTA)</div></div>
+      </div>
+    </section>
+
+    <!-- ===================== TEXTURE ===================== -->
+    <section class="doc-section" id="texture">
+      <div class="sec-head"><h2>Photography &amp; pattern</h2><p>Every "photo" in Terra is real field texture, not a flat gradient — generated once and embedded as data assets so the system stays fully self-contained (no external image requests, nothing to break). The topographic contour pattern is the signature mark on marketing and hero surfaces.</p></div>
+      <div class="preview-label">Topographic pattern — <code style="font-family:monospace;">.bg-topo</code></div>
+      <div class="preview" style="padding:0; overflow:hidden; margin-bottom:22px;">
+        <div class="bg-topo" style="height:220px; background-color:var(--bg-canvas);"></div>
+      </div>
+      <div class="preview-label">Field &amp; crop photography</div>
+      <div class="swatch-grid">
+        <div class="swatch"><div class="fill bg-corn-field" style="height:110px;"></div><div class="info"><div class="n">Corn field</div><div class="h">.bg-corn-field</div></div></div>
+        <div class="swatch"><div class="fill bg-empty-field" style="height:110px;"></div><div class="info"><div class="n">Empty field</div><div class="h">.bg-empty-field</div></div></div>
+        <div class="swatch"><div class="fill bg-crop-closeup" style="height:110px;"></div><div class="info"><div class="n">Crop close-up</div><div class="h">.bg-crop-closeup</div></div></div>
+        <div class="swatch"><div class="fill bg-aerial-plots" style="height:110px;"></div><div class="info"><div class="n">Aerial plots</div><div class="h">.bg-aerial-plots</div></div></div>
+      </div>
+      <div class="spec-code" style="margin-top:14px;"><span class="tag">&lt;div</span> <span class="cls">class="hero-marketing bg-topo"</span><span class="tag">&gt;</span> · <span class="cls">class="field-card__photo is-corn"</span> · <span class="cls">class="stat-photo-panel"</span> (crop-closeup by default)</div>
+    </section>
+
+    <!-- ===================== BUTTONS ===================== -->
+    <section class="doc-section" id="buttons">
+      <div class="sec-head"><h2>Buttons</h2><p>Dark is the primary action color across the product; lime is reserved for the single highest-priority CTA on a screen.</p></div>
+      <div class="preview preview-row">
+        <button class="btn btn-dark">Confirm &amp; save log</button>
+        <button class="btn btn-lime">Try for free</button>
+        <button class="btn btn-white">Choose another</button>
+        <button class="btn btn-ghost">Skip</button>
+        <button class="btn btn-dark" disabled>Disabled</button>
+      </div>
+      <div class="preview preview-row">
+        <button class="btn-icon btn-icon-dark"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+        <button class="btn-icon btn-icon-lime"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+        <button class="btn-icon btn-icon-white"><svg class="icon"><use href="#i-navigation"/></svg></button>
+        <button class="btn-icon btn-icon-neutral"><svg class="icon"><use href="#i-x"/></svg></button>
+        <button class="btn-icon btn-icon-glass" style="background:var(--ink-700);"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;button</span> <span class="cls">class="btn btn-dark"</span><span class="tag">&gt;</span>Confirm &amp; save log<span class="tag">&lt;/button&gt;</span><br><span class="tag">&lt;button</span> <span class="cls">class="btn-icon btn-icon-lime"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/button&gt;</span></div>
+
+      <div class="sec-head" style="margin-top:38px;"><h3 style="font-size:17px;font-weight:700;letter-spacing:var(--tracking-tight);">Destructive</h3><p>For actions that lose work. <code>btn-danger</code> is the irreversible confirm itself; <code>btn-danger-soft</code> is for a destructive action that is not the loudest thing on the screen. Neither carries a glow — a delete button should never look like the thing you want tapped.</p></div>
+      <div class="preview preview-row">
+        <button class="btn btn-danger">Delete log</button>
+        <button class="btn btn-danger-soft">Discard recording</button>
+        <button class="btn btn-danger-soft btn-sm"><svg class="icon"><use href="#i-trash-2"/></svg>Remove photo</button>
+        <button class="btn btn-danger" disabled>Disabled</button>
+        <button class="btn-icon btn-icon-danger"><svg class="icon"><use href="#i-trash-2"/></svg></button>
+        <button class="btn-icon btn-icon-danger-soft btn-icon-sm"><svg class="icon"><use href="#i-x"/></svg></button>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;button</span> <span class="cls">class="btn btn-danger"</span><span class="tag">&gt;</span>Delete log<span class="tag">&lt;/button&gt;</span><br><span class="tag">&lt;button</span> <span class="cls">class="btn btn-danger-soft"</span><span class="tag">&gt;</span>Discard recording<span class="tag">&lt;/button&gt;</span></div>
+      <div class="note">Pair the destructive confirm with a quiet way out — <code>btn-white</code> or <code>btn-ghost</code> for Cancel — and never make the destructive button the only one in a dialog. <code>--danger</code> resolves to <code>--red-600</code>, not <code>--red-500</code>: white on red-500 is 3.9:1 and fails AA at 14.5px bold, while red-600 clears it at 5.1:1. <code>--red-500</code> stays the signal colour for the recording dot and other indicators, where that rule does not apply.</div>
+    </section>
+
+    <!-- ===================== SEGMENTED ===================== -->
+    <section class="doc-section" id="segmented">
+      <div class="sec-head"><h2>Segmented controls</h2><p>Used for units, time ranges, and the productivity-zone stepper.</p></div>
+      <div class="preview preview-row" style="flex-direction:column; align-items:flex-start; gap:16px;">
+        <div class="pill-group">
+          <button class="pill-opt is-active">kg/ha</button>
+          <button class="pill-opt">L/ha</button>
+        </div>
+        <div class="pill-group">
+          <button class="pill-opt">W</button>
+          <button class="pill-opt is-active">M</button>
+          <button class="pill-opt">Y</button>
+        </div>
+        <div class="pill-group pill-numbers">
+          <button class="pill-opt">3</button>
+          <button class="pill-opt is-active">4</button>
+          <button class="pill-opt">5</button>
+          <button class="pill-opt">6</button>
+          <button class="pill-opt">7</button>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="pill-group"</span><span class="tag">&gt;&lt;button</span> <span class="cls">class="pill-opt is-active"</span><span class="tag">&gt;</span>kg/ha<span class="tag">&lt;/button&gt;…&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== CHIPS ===================== -->
+    <section class="doc-section" id="chips">
+      <div class="sec-head"><h2>Chips &amp; tags</h2><p>Compact status markers — inline chips for cards, floating tags for photo and map overlays.</p></div>
+      <div class="preview preview-row">
+        <span class="chip">Standard</span>
+        <span class="chip chip-lime">Near</span>
+        <span class="chip chip-live"><span class="dot"></span>Live</span>
+      </div>
+      <div class="preview" style="background:var(--ink-900); padding:32px;">
+        <div class="tag-float" style="width:180px;">
+          <div class="tag-label">High</div>
+          <div class="tag-values">85 kg/h <span class="sub">4.5 ha</span></div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;span</span> <span class="cls">class="chip chip-live"</span><span class="tag">&gt;&lt;span</span> <span class="cls">class="dot"</span><span class="tag">&gt;&lt;/span&gt;</span>Live<span class="tag">&lt;/span&gt;</span></div>
+    </section>
+
+    <!-- ===================== FORMS ===================== -->
+    <section class="doc-section" id="forms">
+      <div class="sec-head"><h2>Form fields</h2><p>Rate inputs, unit toggles, and the lime crop selector used throughout data-entry screens.</p></div>
+      <div class="preview" style="max-width:420px;">
+        <div class="t-stack" style="gap:16px;">
+          <div class="field">
+            <div class="field-label">Standard rate</div>
+            <div class="field-row">
+              <input class="input" value="100">
+              <div class="pill-group"><button class="pill-opt is-active">kg/ha</button><button class="pill-opt">L/ha</button></div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label">Crop</div>
+            <button class="select">Corn, grain <svg class="icon chev"><use href="#i-chevron-down"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;input</span> <span class="cls">class="input"</span><span class="tag">&gt;</span> · <span class="tag">&lt;button</span> <span class="cls">class="select"</span><span class="tag">&gt;</span>Corn, grain<span class="tag">&lt;/button&gt;</span></div>
+    </section>
+
+    <!-- ===================== LIST ROW ===================== -->
+    <section class="doc-section" id="list-row">
+      <div class="sec-head"><h2>List row</h2><p>Icon tile + label/value pairing with an optional trailing link — used for summary rows and the Anara review fields.</p></div>
+      <div class="preview" style="max-width:420px;">
+        <div class="t-stack" style="gap:10px;">
+          <div class="card card-pad-sm list-row">
+            <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-notebook-pen"/></svg></div>
+            <div class="lr-info"><div class="lr-value">3 logs today</div><div class="lr-sub">across Sections 1, 2 and 4</div></div>
+            <svg class="icon" style="color:var(--text-tertiary);"><use href="#i-chevron-right"/></svg>
+          </div>
+          <div class="card card-pad-sm list-row">
+            <div class="lr-tile" style="background:#FEE4E2; color:#B42318;"><svg class="icon"><use href="#i-bug"/></svg></div>
+            <div class="lr-info"><div class="lr-label">Category</div><div class="lr-value">Pest / disease</div></div>
+            <button class="lr-action">Change<svg class="icon"><use href="#i-chevron-right"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="card card-pad-sm list-row"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="lr-tile"</span><span class="tag">&gt;…&lt;div</span> <span class="cls">class="lr-info"</span><span class="tag">&gt;</span>…</div>
+    </section>
+
+    <!-- ===================== FIELD CARD ===================== -->
+    <section class="doc-section" id="field-card">
+      <div class="sec-head"><h2>01 · Field card</h2><p>Photo + plot outline, field name, area, and a lime "open" action.</p></div>
+      <div class="preview preview-row">
+        <div class="field-card" style="width:220px;">
+          <div class="photo is-corn">
+            <svg class="plot" viewBox="0 0 220 132"><polygon points="70,20 170,55 130,112 55,80" fill="rgba(168,226,47,.18)" stroke="#A8E22F" stroke-width="2.5"/></svg>
+          </div>
+          <div class="meta">
+            <div><div class="name">Corn field</div><div class="area">18 ha</div></div>
+            <button class="btn-icon btn-icon-lime btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+          </div>
+        </div>
+        <div class="field-card" style="width:220px;">
+          <div class="photo is-empty">
+            <svg class="plot" viewBox="0 0 220 132"><polygon points="60,25 160,15 175,90 90,115" fill="rgba(255,255,255,.10)" stroke="#ffffff" stroke-width="2"/></svg>
+          </div>
+          <div class="meta">
+            <div><div class="name">Empty field</div><div class="area">15 ha</div></div>
+            <button class="btn-icon btn-icon-lime btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="field-card"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="photo"</span><span class="tag">&gt;…&lt;/div&gt;&lt;div</span> <span class="cls">class="meta"</span><span class="tag">&gt;</span>name · area · <span class="cls">btn-icon-lime</span><span class="tag">&lt;/div&gt;&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== WEATHER CARD ===================== -->
+    <section class="doc-section" id="weather-card">
+      <div class="sec-head"><h2>02 · Weather card</h2><p>Location, current conditions, and a four-column metrics row.</p></div>
+      <div class="preview">
+        <div class="card card-pad weather-card" style="max-width:460px;">
+          <div class="loc"><svg class="icon"><use href="#i-map-pin"/></svg>Vynnyky, Lviv Oblast, Ukraine</div>
+          <div class="now">
+            <div>
+              <div class="temp">+16°</div>
+              <div class="hilo">H: +19°<br>L: +10°</div>
+            </div>
+            <span class="wicon"><svg class="icon"><use href="#i-cloud"/></svg></span>
+          </div>
+          <div class="weather-metrics">
+            <div><div class="m-label">HUMIDITY</div><div class="m-val">74%</div></div>
+            <div><div class="m-label">PRECIPITATION</div><div class="m-val">5 mm</div></div>
+            <div><div class="m-label">PRESSURE</div><div class="m-val">1019 hPa</div></div>
+            <div><div class="m-label">WIND</div><div class="m-val">18 km/h</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="card card-pad weather-card"</span><span class="tag">&gt;</span> loc · temp/hilo/wicon · <span class="cls">weather-metrics</span><span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== ZONE CARD ===================== -->
+    <section class="doc-section" id="zone-card">
+      <div class="sec-head"><h2>03 · Zone rate card</h2><p>A 2×2 grid pairing a zone-intensity dot with its application rate and area.</p></div>
+      <div class="preview">
+        <div class="card card-pad" style="max-width:420px;">
+          <div class="u-flex u-justify-between u-items-center u-mt-1" style="margin-bottom:14px;">
+            <div class="t-title" style="font-size:15px;">Rate for zone</div>
+            <a href="#" class="t-caption" style="font-weight:700; color:var(--text-link); text-decoration:none;">Edit</a>
+          </div>
+          <div class="zone-grid">
+            <div class="zone-row"><span class="zlabel"><span class="zdot zdot-very-high"></span>Very high</span><span class="zval">70 kg/h<br>1.8 ha</span></div>
+            <div class="zone-row"><span class="zlabel"><span class="zdot zdot-high"></span>High</span><span class="zval">85 kg/h<br>4.5 ha</span></div>
+            <div class="zone-row"><span class="zlabel"><span class="zdot zdot-average"></span>Average</span><span class="zval">100 kg/h<br>5.5 ha</span></div>
+            <div class="zone-row"><span class="zlabel"><span class="zdot zdot-low"></span>Low</span><span class="zval">115 kg/h<br>6.2 ha</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="zone-row"</span><span class="tag">&gt;&lt;span</span> <span class="cls">class="zdot zdot-high"</span><span class="tag">&gt;&lt;/span&gt;</span>High<span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== STAT PANEL ===================== -->
+    <section class="doc-section" id="stat-panel">
+      <div class="sec-head"><h2>04 · Stat photo panel</h2><p>Glass tiles over full-bleed field photography, with a harvest-countdown progress footer.</p></div>
+      <div class="preview">
+        <div class="stat-photo-panel" style="max-width:640px;">
+          <div class="stat-tiles">
+            <div class="stat-tile"><svg class="icon ticon"><use href="#i-sprout"/></svg><div><div class="tval">93%</div><div class="tref">of reference value</div></div><div class="tlabel">Plant's health</div></div>
+            <div class="stat-tile"><svg class="icon ticon"><use href="#i-droplet"/></svg><div><div class="tval">85%</div><div class="tref">of reference value</div></div><div class="tlabel">Water depth</div></div>
+            <div class="stat-tile"><svg class="icon ticon"><use href="#i-globe"/></svg><div><div class="tval">74%</div><div class="tref">of reference value</div></div><div class="tlabel">Soil</div></div>
+          </div>
+          <div class="stat-photo-footer">
+            <span class="flabel">10 days to harvest</span>
+            <div class="progress-track"><div class="progress-fill" style="width:86%;"></div></div>
+            <span class="fval">64/74</span>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="stat-photo-panel"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="stat-tiles"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="stat-tile"</span><span class="tag">&gt;</span>…</div>
+    </section>
+
+    <!-- ===================== MAP CARD ===================== -->
+    <section class="doc-section" id="map-card">
+      <div class="sec-head"><h2>05 · Map zone card</h2><p>Aerial field photo with a dotted variable-rate overlay and floating data tags.</p></div>
+      <div class="preview">
+        <div class="map-card" style="max-width:420px;">
+          <div class="map-inner">
+            <svg class="plot-overlay" viewBox="0 0 420 220" preserveAspectRatio="none">
+              <polygon points="120,20 360,60 300,190 60,150" fill="rgba(0,0,0,.08)"/>
+            </svg>
+            <div class="tag-float" style="top:16px; right:16px;"><div class="tag-label">High</div><div class="tag-values">85 kg/h <span class="sub">4.5 ha</span></div></div>
+            <div class="tag-float" style="left:16px; bottom:16px; width:180px;"><div class="tag-label">Low</div><div class="tag-values">115 kg/h <span class="sub">6.2 ha</span></div></div>
+            <button class="btn-icon btn-icon-white btn-icon-sm" style="position:absolute; right:16px; bottom:16px;"><svg class="icon"><use href="#i-navigation"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="map-card"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="tag-float"</span><span class="tag">&gt;</span>… <span class="cls">btn-icon-white</span> compass<span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== CHART CARD ===================== -->
+    <section class="doc-section" id="chart-card">
+      <div class="sec-head"><h2>06 · Growth chart card</h2><p>A minimal bar chart with a time-range segmented control.</p></div>
+      <div class="preview">
+        <div class="card card-pad chart-card" style="max-width:380px;">
+          <div class="chart-head">
+            <div class="t-title" style="font-size:15px;">Growth rate</div>
+            <div class="pill-group"><button class="pill-opt">W</button><button class="pill-opt is-active">M</button><button class="pill-opt">Y</button></div>
+          </div>
+          <div class="chart-value">0.75 <svg class="icon" style="color:var(--text-tertiary); font-size:15px;"><use href="#i-chevron-down"/></svg></div>
+          <div class="bar-chart" id="ds-bars"></div>
+          <div class="chart-foot"><span>July, 24</span><span>August, 24</span></div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="bar-chart"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="bar hi"</span><span class="tag">&gt;&lt;/div&gt;</span>…<span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== PROMO / HERO ===================== -->
+    <section class="doc-section" id="promo">
+      <div class="sec-head"><h2>07 · Promo &amp; hero cards</h2><p>Marketing-weight surfaces: an inline promo card for feeds, and a full hero for onboarding.</p></div>
+      <div class="preview preview-row">
+        <div class="promo-card" style="width:280px;">
+          <button class="btn-icon btn-icon-dark btn-icon-sm promo-fab"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+          <div class="promo-body">
+            <div class="promo-title">VRA map for<br>fertilizing</div>
+            <div class="promo-desc">Ensuring efficient resource utilization and improved crop yields.</div>
+          </div>
+          <div class="promo-photo">
+            <div class="tag-float"><div class="tag-label">High</div><div class="tag-values">95n kg/h <span class="sub">6.5 ha</span></div></div>
+          </div>
+        </div>
+        <div class="hero-marketing" style="width:280px;">
+          <div class="hm-copy">Boost <span class="chip chip-lime">agriculture</span> production through mechanization</div>
+          <button class="btn btn-lime btn-block">Try for free <svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="hero-marketing"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="hm-copy"</span><span class="tag">&gt;</span>…<span class="tag">&lt;button</span> <span class="cls">class="btn btn-lime btn-block"</span><span class="tag">&gt;</span></div>
+    </section>
+
+    <!-- ===================== CTA RAIL ===================== -->
+    <section class="doc-section" id="cta-rail">
+      <div class="sec-head"><h2>08 · CTA rail</h2><p>The vertical floating call-to-action used alongside dense dashboard grids.</p></div>
+      <div class="preview" style="height:220px; position:relative;">
+        <div class="cta-rail" style="height:180px;">
+          <div class="rail-btn"><svg class="icon"><use href="#i-arrow-up-right"/></svg></div>
+          <div class="rail-text">TRY FOR FREE</div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="cta-rail"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="rail-btn"</span><span class="tag">&gt;</span>…<span class="cls">rail-text</span><span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== RECORD HERO ===================== -->
+    <section class="doc-section" id="record-hero">
+      <div class="sec-head"><h2>Record hero</h2><p>The voice-capture state card used at the top of the "New log" screen — a soft lime ground carrying the contour pattern, with an ink waveform and a large tabular timer.</p></div>
+      <div class="preview preview-row">
+        <div class="record-hero" style="width:280px;">
+          <div class="rh-badge"><span class="rec-dot"></span>Recording</div>
+          <div class="rh-wave" id="ds-wave"></div>
+          <div class="rh-timer">0:12</div>
+          <button class="btn-icon btn-icon-dark btn-icon-lg"><svg class="icon"><use href="#i-mic"/></svg></button>
+          <div class="rh-hint">Speak naturally — tap to stop</div>
+        </div>
+        <div class="record-hero" style="width:280px;">
+          <div class="rh-badge"><svg class="icon"><use href="#i-check"/></svg>Voice note recorded</div>
+          <div class="rh-timer">0:12</div>
+          <div class="rh-controls">
+            <button class="btn-icon btn-icon-dark btn-icon-lg"><svg class="icon"><use href="#i-play"/></svg></button>
+            <button class="btn btn-white btn-sm"><svg class="icon"><use href="#i-rotate-ccw"/></svg>Re-record</button>
+          </div>
+          <div class="rh-hint">Recording stopped — you can still add photos or a note</div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="record-hero"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="rh-badge"</span><span class="tag">&gt;…&lt;div</span> <span class="cls">class="rh-wave"</span><span class="tag">&gt;…&lt;div</span> <span class="cls">class="rh-timer"</span><span class="tag">&gt;</span>0:12<span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== VIEWFINDER ===================== -->
+    <section class="doc-section" id="viewfinder">
+      <div class="sec-head"><h2>Viewfinder</h2><p>Camera capture surface with a corner reticle and shutter button, plus its permission-denied fallback.</p></div>
+      <div class="preview preview-row">
+        <div class="viewfinder" style="width:280px;">
+          <span class="vf-corner vf-tl"></span><span class="vf-corner vf-tr"></span><span class="vf-corner vf-bl"></span><span class="vf-corner vf-br"></span>
+          <div class="vf-hint"><svg class="icon"><use href="#i-info"/></svg>Tap to take a photo</div>
+          <button class="shutter-btn"><span class="inner"></span></button>
+        </div>
+        <div class="state-panel" style="width:280px;">
+          <span class="sp-icon"><svg class="icon"><use href="#i-camera-off"/></svg></span>
+          <div class="sp-title">Camera off — voice only</div>
+          <div class="sp-desc">Enable camera access to snap photos here.</div>
+          <button class="btn btn-white btn-sm"><svg class="icon"><use href="#i-camera"/></svg>Enable camera</button>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="viewfinder"</span><span class="tag">&gt;…&lt;button</span> <span class="cls">class="shutter-btn"</span><span class="tag">&gt;</span> · <span class="cls">class="state-panel"</span> fallback</div>
+    </section>
+
+    <!-- ===================== THUMBNAILS ===================== -->
+    <section class="doc-section" id="thumbnails">
+      <div class="sec-head"><h2>Thumbnails</h2><p>Captured photo/video strip with per-item remove and a trailing count.</p></div>
+      <div class="preview">
+        <div class="thumbs-strip">
+          <div class="thumb"><svg class="icon"><use href="#i-image"/></svg><button class="thumb-rm"><svg class="icon"><use href="#i-x"/></svg></button></div>
+          <div class="thumb"><svg class="icon"><use href="#i-image"/></svg><button class="thumb-rm"><svg class="icon"><use href="#i-x"/></svg></button></div>
+          <div class="thumb is-video"><svg class="icon filled"><use href="#i-play"/></svg><span class="thumb-dur">0:08</span><button class="thumb-rm"><svg class="icon"><use href="#i-x"/></svg></button></div>
+          <span class="thumbs-count">3 items</span>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="thumbs-strip"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="thumb is-video"</span><span class="tag">&gt;…</span></div>
+    </section>
+
+    <!-- ===================== MAP FULL ===================== -->
+    <section class="doc-section" id="map-full">
+      <div class="sec-head"><h2>Full-screen map</h2><p>The location-adjust take-over: a draggable base layer, a fixed pin, and a bottom sheet.</p></div>
+      <div class="preview" style="padding:0; overflow:hidden;">
+        <div class="map-full" style="height:340px;">
+          <div class="map-drag-bg"></div>
+          <div class="map-top-scrim"></div>
+          <svg class="icon map-pin-fixed filled"><use href="#i-map-pin"/></svg>
+          <div class="map-acc-circle"></div>
+          <div class="map-sheet">
+            <div class="map-grab"></div>
+            <div class="t-title" style="font-size:15.5px; margin-bottom:10px;">Drag the map to place the pin</div>
+            <button class="btn btn-dark btn-block">Use this location</button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="map-full"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="map-drag-bg"</span><span class="tag">&gt;&lt;/div&gt;…&lt;div</span> <span class="cls">class="map-sheet"</span><span class="tag">&gt;</span></div>
+    </section>
+
+    <!-- ===================== STATUS BAR ===================== -->
+    <section class="doc-section" id="statusbar">
+      <div class="sec-head"><h2>13 · Status bar</h2><p>Device chrome, light and photo-overlay variants.</p></div>
+      <div class="preview preview-row">
+        <div class="card card-pad-sm" style="width:280px;">
+          <div class="status-bar"><span>9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+        </div>
+        <div style="width:280px; background:var(--ink-900); border-radius:16px; padding:16px;">
+          <div class="status-bar on-dark"><span>9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="status-bar on-dark"</span><span class="tag">&gt;</span>9:41 <span class="cls">sb-icons</span><span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== TOPBAR ===================== -->
+    <section class="doc-section" id="topbar">
+      <div class="sec-head"><h2>14 · Mobile topbar</h2><p>Back navigation with an uppercase, tracked page title.</p></div>
+      <div class="preview">
+        <div class="mobile-topbar">
+          <button class="btn-icon btn-icon-neutral btn-icon-sm"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+          <div class="title">VRA map for fertilizing</div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="mobile-topbar"</span><span class="tag">&gt;&lt;button</span> <span class="cls">class="btn-icon btn-icon-neutral"</span><span class="tag">&gt;</span>…<span class="cls">title</span><span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== WELCOME ===================== -->
+    <section class="doc-section" id="welcome">
+      <div class="sec-head"><h2>15 · Welcome header</h2><p>Personalized greeting paired with the account avatar.</p></div>
+      <div class="preview">
+        <div class="welcome-header" style="max-width:380px;">
+          <div class="greet">Welcome back,<br>Taras</div>
+          <div class="avatar" style="background:linear-gradient(140deg,#8a8f80,#454a3b);"></div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="welcome-header"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="greet"</span><span class="tag">&gt;</span>… <span class="cls">class="avatar"</span><span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <!-- ===================== TABBAR ===================== -->
+    <section class="doc-section" id="tabbar">
+      <div class="sec-head"><h2>16 · Tab bar</h2><p>Bottom navigation, four destinations, active state in ink + lime.</p></div>
+      <div class="preview">
+        <div class="card card-pad-sm" style="max-width:380px;">
+          <div class="tabbar">
+            <button class="tab is-active"><span class="ti"><svg class="icon"><use href="#i-house"/></svg></span>Home</button>
+            <button class="tab"><span class="ti"><svg class="icon"><use href="#i-circle-plus"/></svg></span>Assign</button>
+            <button class="tab"><span class="ti"><svg class="icon"><use href="#i-clipboard-check"/></svg></span>Review</button>
+            <button class="tab"><span class="ti"><svg class="icon"><use href="#i-map"/></svg></span>Farm</button>
+          </div>
+        </div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="tabbar"</span><span class="tag">&gt;&lt;button</span> <span class="cls">class="tab is-active"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/div&gt;</span></div>
+    </section>
+
+    <footer style="padding-top:32px; border-top:1px solid var(--border-subtle); color:var(--text-tertiary); font-size:12.5px;">
+      Terra Design System · built for the PalmTrack capture flow prototype · <a href="../capture-flow.html" style="color:var(--text-link); font-weight:700; text-decoration:none;">view the flow →</a>
+    </footer>
+  </main>
+</div>
+
+<!-- Icon sprite -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7" /> <path d="M19 12H5" /></symbol>
+<symbol id="i-arrow-up-right" viewBox="0 0 24 24"><path d="M7 7h10v10" /> <path d="M7 17 17 7" /></symbol>
+<symbol id="i-battery-full" viewBox="0 0 24 24"><path d="M10 10v4" /> <path d="M14 10v4" /> <path d="M22 14v-4" /> <path d="M6 10v4" /> <rect x="2" y="6" width="16" height="12" rx="2" /></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M10.268 21a2 2 0 0 0 3.464 0" /> <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" /></symbol>
+<symbol id="i-bug" viewBox="0 0 24 24"><path d="M12 20v-9" /> <path d="M14 7a4 4 0 0 1 4 4v3a6 6 0 0 1-12 0v-3a4 4 0 0 1 4-4z" /> <path d="M14.12 3.88 16 2" /> <path d="M21 21a4 4 0 0 0-3.81-4" /> <path d="M21 5a4 4 0 0 1-3.55 3.97" /> <path d="M22 13h-4" /> <path d="M3 21a4 4 0 0 1 3.81-4" /> <path d="M3 5a4 4 0 0 0 3.55 3.97" /> <path d="M6 13H2" /> <path d="m8 2 1.88 1.88" /> <path d="M9 7.13V6a3 3 0 1 1 6 0v1.13" /></symbol>
+<symbol id="i-camera-off" viewBox="0 0 24 24"><path d="M14.564 14.558a3 3 0 1 1-4.122-4.121" /> <path d="m2 2 20 20" /> <path d="M20 20H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 .819-.175" /> <path d="M9.695 4.024A2 2 0 0 1 10.004 4h3.993a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v7.344" /></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M13.997 4a2 2 0 0 1 1.76 1.05l.486.9A2 2 0 0 0 18.003 7H20a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1.997a2 2 0 0 0 1.759-1.048l.489-.904A2 2 0 0 1 10.004 4z" /> <circle cx="12" cy="13" r="3" /></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+<symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m9 12 2 2 4-4" /></symbol>
+<symbol id="i-circle-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M8 12h8" /> <path d="M12 8v8" /></symbol>
+<symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="m9 14 2 2 4-4" /></symbol>
+<symbol id="i-cloud-rain" viewBox="0 0 24 24"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" /> <path d="M16 14v6" /> <path d="M8 14v6" /> <path d="M12 16v6" /></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" /></symbol>
+<symbol id="i-crosshair" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <line x1="22" x2="18" y1="12" y2="12" /> <line x1="6" x2="2" y1="12" y2="12" /> <line x1="12" x2="12" y1="6" y2="2" /> <line x1="12" x2="12" y1="22" y2="18" /></symbol>
+<symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" /></symbol>
+<symbol id="i-gauge" viewBox="0 0 24 24"><path d="m12 14 4-4" /> <path d="M3.34 19a10 10 0 1 1 17.32 0" /></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" /> <path d="M2 12h20" /></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></symbol>
+<symbol id="i-images" viewBox="0 0 24 24"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16" /> <path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2" /> <circle cx="13" cy="7" r="1" fill="currentColor" /> <rect x="8" y="2" width="14" height="14" rx="2" /></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="M12 16v-4" /> <path d="M12 8h.01" /></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" /> <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></symbol>
+<symbol id="i-list-checks" viewBox="0 0 24 24"><path d="M13 5h8" /> <path d="M13 12h8" /> <path d="M13 19h8" /> <path d="m3 17 2 2 4-4" /> <path d="m3 7 2 2 4-4" /></symbol>
+<symbol id="i-locate-fixed" viewBox="0 0 24 24"><line x1="2" x2="5" y1="12" y2="12" /> <line x1="19" x2="22" y1="12" y2="12" /> <line x1="12" x2="12" y1="2" y2="5" /> <line x1="12" x2="12" y1="19" y2="22" /> <circle cx="12" cy="12" r="7" /> <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0" /> <circle cx="12" cy="10" r="3" /></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /> <path d="M15 5.764v15" /> <path d="M9 3.236v15" /></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 19v3" /> <path d="M19 10v2a7 7 0 0 1-14 0v-2" /> <rect x="9" y="2" width="6" height="13" rx="3" /></symbol>
+<symbol id="i-move" viewBox="0 0 24 24"><path d="M12 2v20" /> <path d="m15 19-3 3-3-3" /> <path d="m19 9 3 3-3 3" /> <path d="M2 12h20" /> <path d="m5 9-3 3 3 3" /> <path d="m9 5 3-3 3 3" /></symbol>
+<symbol id="i-navigation" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11" /></symbol>
+<symbol id="i-notebook-pen" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4" /> <path d="M2 6h4" /> <path d="M2 10h4" /> <path d="M2 14h4" /> <path d="M2 18h4" /> <path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z" /></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" /> <path d="M12 22V12" /> <polyline points="3.29 7 12 12 20.71 7" /> <path d="m7.5 4.27 9 5.15" /></symbol>
+<symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551" /></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="3" width="5" height="18" rx="1" /> <rect x="5" y="3" width="5" height="18" rx="1" /></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /> <path d="m15 5 4 4" /></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z" /></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="M12 5v14" /></symbol>
+<symbol id="i-rotate-ccw" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /> <path d="M3 3v5h5" /></symbol>
+<symbol id="i-signal" viewBox="0 0 24 24"><path d="M2 20h.01" /> <path d="M7 20v-4" /> <path d="M12 20v-8" /> <path d="M17 20V8" /> <path d="M22 4v16" /></symbol>
+<symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z" /> <path d="M20 2v4" /> <path d="M22 4h-4" /> <circle cx="4" cy="20" r="2" /></symbol>
+<symbol id="i-sprout" viewBox="0 0 24 24"><path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3" /> <path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4" /> <path d="M5 21h14" /></symbol>
+<symbol id="i-sun-medium" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /> <path d="M12 3v1" /> <path d="M12 20v1" /> <path d="M3 12h1" /> <path d="M20 12h1" /> <path d="m18.364 5.636-.707.707" /> <path d="m6.343 17.657-.707.707" /> <path d="m5.636 5.636.707.707" /> <path d="m17.657 17.657.707.707" /></symbol>
+<symbol id="i-thermometer" viewBox="0 0 24 24"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z" /></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5" /> <rect x="2" y="6" width="14" height="12" rx="2" /></symbol>
+<symbol id="i-trash-2" viewBox="0 0 24 24"><path d="M3 6h18" /> <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /> <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /> <line x1="10" x2="10" y1="11" y2="17" /> <line x1="14" x2="14" y1="11" y2="17" /></symbol>
+<symbol id="i-volume-2" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" /> <path d="M16 9a5 5 0 0 1 0 6" /> <path d="M19.364 18.364a9 9 0 0 0 0-12.728" /></symbol>
+<symbol id="i-volume-x" viewBox="0 0 24 24"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z" /> <line x1="22" x2="16" y1="9" y2="15" /> <line x1="16" x2="22" y1="9" y2="15" /></symbol>
+<symbol id="i-wifi" viewBox="0 0 24 24"><path d="M12 20h.01" /> <path d="M2 8.82a15 15 0 0 1 20 0" /> <path d="M5 12.859a10 10 0 0 1 14 0" /> <path d="M8.5 16.429a5 5 0 0 1 7 0" /></symbol>
+<symbol id="i-wind" viewBox="0 0 24 24"><path d="M12.8 19.6A2 2 0 1 0 14 16H2" /> <path d="M17.5 8a2.5 2.5 0 1 1 2 4H2" /> <path d="M9.8 4.4A2 2 0 1 1 11 8H2" /></symbol>
+<symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /> <path d="m15 9-6 6" /> <path d="m9 9 6 6" /></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /> <path d="m6 6 12 12" /></symbol>
+</svg>
+
+<script>
+  var heights = [14,22,34,44,26,16,30,46,24,14,38,48,28,18,12,26,42,34,20,12,28,40,30,18,10,24];
+  var el = document.getElementById('ds-bars');
+  heights.forEach(function(h,i){
+    var b = document.createElement('div');
+    b.className = 'bar' + (i>=16 && i<=21 ? ' hi' : '');
+    b.style.height = h+'px';
+    el.appendChild(b);
+  });
+
+  var waveHeights = [10,20,34,44,26,14,30,46,22,12,38,48,28,16,10,24];
+  var waveEl = document.getElementById('ds-wave');
+  waveHeights.forEach(function(h,i){
+    var b = document.createElement('div');
+    b.className = 'b';
+    b.style.height = h+'px';
+    b.style.animationDelay = (i*0.05)+'s';
+    waveEl.appendChild(b);
+  });
+</script>
+</div>
+
+</body>
+</html>
