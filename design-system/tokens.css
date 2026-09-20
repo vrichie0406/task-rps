@@ -1,40 +1,62 @@
 /*
   Terra — Design tokens
-  Precision-agriculture UI system. One token set, consumed by every
-  component in components.css and every screen in the product.
+  The SupaFarm design system. One token set, consumed by every component in
+  components.css and every screen in the product.
+
+  The palette is derived from the SupaFarm wordmark, sampled from the logo
+  artwork itself: the navy of "supa" (#001834) and the green gradient across
+  "farm" (#68A605 -> #066F2D). Every foreground/background pair the product
+  uses is checked against WCAG 2.1 AA by `node validate-contrast.js`, which
+  parses THIS file — so these values are the source of truth for the audit,
+  not a copy of it.
 */
 :root{
-  /* ---------- Core palette ---------- */
-  --lime-50:  #F5FCE3;
-  --lime-100: #E8F9BE;
-  --lime-300: #C8EE72;
-  --lime-400: #B7EA48;
-  --lime-500: #A8E22F;   /* primary brand accent */
-  --lime-600: #8FC922;
-  --lime-700: #6E9C1B;
+  /* ---------- Brand green — the "farm" gradient's bright end ----------
+     #68A605 is the logo colour. It is dark enough that WHITE text on it is
+     only 3.0:1, so it always carries navy text; for a green button with
+     white text use --accent-deep (the gradient's forest end) instead. */
+  --green-50:  #F2F9E2;
+  --green-100: #E1F2BF;
+  --green-200: #C6E68D;
+  --green-300: #A5D557;
+  --green-400: #85BE26;   /* accent hover — brighter, not darker; see below */
+  --green-500: #68A605;   /* BRAND — sampled from the logo */
+  --green-600: #578C07;
+  --green-700: #456F0C;
 
-  --ink-900: #14150F;    /* near-black, warm */
-  --ink-800: #1D2017;
-  --ink-700: #2B2F23;
-  --ink-600: #454A3B;
-  --ink-500: #666B5B;
-  --ink-400: #8A8F80;
-  --ink-300: #AFB4A5;
+  /* ---------- Forest — the "farm" gradient's deep end ---------- */
+  --forest-500: #0E8A3A;
+  --forest-600: #087A31;
+  --forest-700: #066F2D;  /* BRAND — sampled from the logo */
+  --forest-800: #054F21;
+
+  /* ---------- Navy — the "supa" wordmark ---------- */
+  --navy-900: #001834;    /* BRAND — sampled from the logo */
+  --navy-800: #032740;
+  --navy-700: #0D3A57;
+  --navy-600: #2A5472;
+  --navy-500: #40617D;
+  --navy-400: #5C7085;
+  --navy-300: #8492A0;    /* lightest step that still clears 3:1 for control borders */
+  --navy-200: #CBD5DE;
 
   --violet-700: #5A3FC0;  /* "very high" zone dot */
   --violet-500: #7C5CFA;  /* "high" zone dot */
   --violet-300: #C6B8FA;  /* "average" zone dot */
   --violet-100: #EDE8FE;
 
+  /* Neutrals carry a slight cool cast so they sit with the navy rather than
+     fighting it — the previous warm-green greys were tuned to a lime accent
+     this system no longer has. */
   --neutral-000: #FFFFFF;
-  --neutral-50:  #F4F5F2;
-  --neutral-100: #E9EBE5;
-  --neutral-150: #E2E4DE;
-  --neutral-200: #D7DAD0;
-  --neutral-300: #C2C6B9;
+  --neutral-50:  #F7F9FA;
+  --neutral-100: #EDF1F4;
+  --neutral-150: #E5EAEF;
+  --neutral-200: #D8DFE6;
+  --neutral-300: #C2CCD6;
 
-  /* Warm-leaning red, so destructive UI sits with the ink/lime palette
-     rather than reading as a cold crimson pasted in from elsewhere. */
+  /* Warm-leaning red, so destructive UI reads as part of the palette
+     rather than a cold crimson pasted in from elsewhere. */
   --red-50:  #FEF3F3;
   --red-100: #FBDFE0;
   --red-300: #F3A3A5;
@@ -49,23 +71,39 @@
   --bg-canvas:     var(--neutral-50);
   --surface:       var(--neutral-000);
   --surface-sunken: var(--neutral-50);
-  --surface-dark:  var(--ink-900);
+  --surface-dark:  var(--navy-900);
 
-  --text-primary:   var(--ink-900);
-  --text-secondary: var(--ink-500);
-  --text-tertiary:  var(--ink-400);
+  --text-primary:   var(--navy-900);
+  --text-secondary: var(--navy-500);
+  --text-tertiary:  var(--navy-400);
   --text-on-dark:   var(--neutral-000);
-  --text-on-dark-soft: rgba(255,255,255,.72);
-  --text-on-lime:   var(--ink-900);
-  --text-link:      var(--ink-700);
+  --text-on-dark-soft: rgba(255,255,255,.76);
+  --text-on-accent: var(--navy-900);
+  --text-link:      var(--navy-700);
 
-  --border-subtle: rgba(20,21,15,.08);
-  --border-default: rgba(20,21,15,.12);
-  --border-on-dark: rgba(255,255,255,.16);
+  --border-subtle:  rgba(0,24,52,.09);
+  --border-default: rgba(0,24,52,.14);
+  --border-on-dark: rgba(255,255,255,.18);
+  /* Control boundaries (inputs, checkboxes) are UI components under WCAG
+     1.4.11 and need 3:1 — the subtle borders above are decorative and do not. */
+  --border-control: var(--navy-300);
 
-  --accent:        var(--lime-500);
-  --accent-strong: var(--lime-600);
-  --accent-soft:   var(--lime-100);
+  --accent:        var(--green-500);
+  /* The accent hover goes BRIGHTER, not darker. The brand green sits close
+     enough to the floor for navy text (5.97:1) that darkening it would drop
+     the label under 4.5:1. */
+  --accent-hover:  var(--green-400);
+  --accent-soft:   var(--green-100);
+  --accent-ink:    var(--forest-700);  /* brand green as text on light grounds */
+
+  /* The gradient's deep end — a green that carries WHITE text at 6.3:1 */
+  --accent-deep:       var(--forest-700);
+  --accent-deep-hover: var(--forest-800);
+  --text-on-accent-deep: var(--neutral-000);
+
+  /* The wordmark gradient. Decorative only — never put text on it: it spans
+     3.0:1 to 6.3:1 against white, so no single text colour is safe across it. */
+  --brand-gradient: linear-gradient(101deg, var(--green-500) 0%, var(--green-600) 38%, var(--forest-700) 100%);
 
   --zone-very-high: var(--violet-700);
   --zone-high:      var(--violet-500);
@@ -129,10 +167,10 @@
   --radius-full: 999px;
 
   /* ---------- Elevation ---------- */
-  --shadow-sm: 0 1px 2px rgba(20,21,15,.05), 0 1px 1px rgba(20,21,15,.04);
-  --shadow-md: 0 8px 24px -8px rgba(20,21,15,.16);
-  --shadow-lg: 0 24px 48px -16px rgba(20,21,15,.24);
-  --shadow-lime: 0 12px 28px -10px rgba(168,226,47,.55);
+  --shadow-sm: 0 1px 2px rgba(0,24,52,.06), 0 1px 1px rgba(0,24,52,.04);
+  --shadow-md: 0 8px 24px -8px rgba(0,24,52,.18);
+  --shadow-lg: 0 24px 48px -16px rgba(0,24,52,.26);
+  --shadow-accent: 0 12px 28px -10px rgba(104,166,5,.45);
 
   /* ---------- Motion ---------- */
   --ease-standard: cubic-bezier(.2,.7,.3,1);
@@ -142,9 +180,8 @@
 }
 
 /*
-  Terra is a deliberately light system — the product lives on paper-white
-  and warm-neutral grounds, with ink reserved for small high-contrast
-  elements (primary buttons, circular actions) and for text sitting over
-  field photography. There is no dark theme by design.
+  Terra is a deliberately light system — the product lives on paper-white and
+  cool-neutral grounds, with navy reserved for small high-contrast elements
+  (primary buttons, circular actions) and for text sitting over field
+  photography. There is no dark theme by design.
 */
-

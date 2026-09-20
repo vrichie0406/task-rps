@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Terra — the design system and component library for the precision-agriculture product suite.">
 <link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="brand.css">
 <link rel="stylesheet" href="textures.css">
 <link rel="stylesheet" href="components.css">
 <style>
@@ -21,7 +22,7 @@
     padding:28px 18px; border-right:1px solid var(--border-subtle);
   }
   .brand{ display:flex; align-items:center; gap:10px; margin-bottom:28px; padding:0 8px; }
-  .brand .mark{ width:30px; height:30px; border-radius:9px; background:var(--ink-900); display:flex; align-items:center; justify-content:center; }
+  .brand .mark{ width:30px; height:30px; border-radius:9px; background:var(--navy-900); display:flex; align-items:center; justify-content:center; }
   .brand .mark span{ width:12px; height:12px; border-radius:3px; background:var(--accent); display:block; }
   .brand .name{ font-weight:700; font-size:15.5px; letter-spacing:var(--tracking-tight); }
   .brand .tag{ font-size:10.5px; color:var(--text-tertiary); font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
@@ -40,7 +41,7 @@
   /* ---- Main ---- */
   .main{ flex:1; min-width:0; padding:44px 56px 120px; max-width:1180px; }
   .page-head{ margin-bottom:56px; }
-  .page-head .eyebrow{ color:var(--accent-strong); }
+  .page-head .eyebrow{ color:var(--accent-ink); }
   .page-head h1{ font-size:44px; font-weight:700; letter-spacing:var(--tracking-tight); margin:10px 0 14px; line-height:1.08; }
   .page-head p{ font-size:16px; color:var(--text-secondary); max-width:640px; line-height:1.6; }
   .page-head .meta-row{ display:flex; gap:10px; margin-top:22px; }
@@ -58,7 +59,7 @@
   .preview-label{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--text-tertiary); margin-bottom:10px; }
 
   .spec-code{
-    background:var(--ink-900); color:#D3F79B; border-radius:12px; padding:14px 18px; font-size:12.5px;
+    background:var(--navy-900); color:#D3F79B; border-radius:12px; padding:14px 18px; font-size:12.5px;
     font-family:'SF Mono', 'Fira Code', Menlo, Consolas, monospace; overflow-x:auto; line-height:1.7;
   }
   .spec-code .tag{ color:#8FB2FF; }
@@ -72,7 +73,7 @@
   }
   .note code, .sec-head code{
     font-family:'SF Mono', 'Fira Code', Menlo, Consolas, monospace; font-size:12px;
-    background:var(--neutral-100); color:var(--ink-700); padding:1px 5px; border-radius:5px;
+    background:var(--neutral-100); color:var(--navy-700); padding:1px 5px; border-radius:5px;
   }
 
   /* swatches */
@@ -128,6 +129,7 @@
     <div class="nav-group">
       <div class="nav-group-label">Foundations</div>
       <a class="nav-link" href="#overview">Overview</a>
+      <a class="nav-link" href="#brand">Brand</a>
       <a class="nav-link" href="#color">Color</a>
       <a class="nav-link" href="#typography">Typography</a>
       <a class="nav-link" href="#spacing">Spacing &amp; radius</a>
@@ -208,36 +210,60 @@
       </div>
     </section>
 
+    <!-- ===================== BRAND ===================== -->
+    <section class="doc-section" id="brand">
+      <div class="sec-head"><h2>Brand</h2><p>The SupaFarm wordmark, embedded as a data URI so the system makes no external image requests. The palette in <code>tokens.css</code> is sampled from this artwork, so the logo and the UI cannot drift apart.</p></div>
+      <div class="preview" style="display:flex; flex-direction:column; gap:26px; align-items:flex-start;">
+        <div class="brand-logo" role="img" aria-label="SupaFarm"></div>
+        <div class="brand-logo brand-logo-sm" role="img" aria-label="SupaFarm"></div>
+        <div class="brand-rule" style="width:180px;"></div>
+      </div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="brand-logo"</span> <span class="cls">role="img"</span> <span class="cls">aria-label="SupaFarm"</span><span class="tag">&gt;&lt;/div&gt;</span><br><span class="tag">&lt;div</span> <span class="cls">class="brand-rule"</span><span class="tag">&gt;&lt;/div&gt;</span></div>
+      <div class="note">The wordmark is an image, so it always needs an accessible name — <code>role="img"</code> plus <code>aria-label</code>. The asset is 2&times; (560&times;110) and meant to render around 280px wide. <code>.brand-rule</code> paints the wordmark’s own gradient; it is decorative and never carries text, because the gradient spans 3.0:1 to 6.3:1 against white and no single text colour is safe across it.</div>
+    </section>
+
     <!-- ===================== COLOR ===================== -->
     <section class="doc-section" id="color">
-      <div class="sec-head"><h2>Color</h2><p>One accent, a warm-neutral ink/paper scale, a violet family reserved for productivity-zone data visualization, and a warm red for destructive actions.</p></div>
+      <div class="sec-head"><h2>Color</h2><p>Two brand colours pulled straight from the SupaFarm wordmark — a navy and a green gradient — on a cool-neutral paper scale, with a violet family reserved for productivity-zone data and a warm red for destructive actions.</p></div>
 
-      <div class="preview-label">Accent — Lime</div>
+      <div class="note" style="margin-bottom:22px;">Every colour below is sampled from the SupaFarm wordmark: the navy of <em>supa</em> and the green gradient across <em>farm</em>. <code>node validate-contrast.js</code> parses <code>tokens.css</code> and checks all 26 foreground/background pairs the product renders against WCAG 2.1 AA.</div>
+
+      <div class="preview-label">Brand green — the gradient's bright end</div>
       <div class="swatch-grid" style="margin-bottom:22px;">
-        <div class="swatch"><div class="fill" style="background:var(--lime-100)"></div><div class="info"><div class="n">Lime 100</div><div class="h">#E8F9BE</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--lime-300)"></div><div class="info"><div class="n">Lime 300</div><div class="h">#C8EE72</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--lime-500)"></div><div class="info"><div class="n">Lime 500 · Accent</div><div class="h">#A8E22F</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--lime-600)"></div><div class="info"><div class="n">Lime 600</div><div class="h">#8FC922</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--lime-700)"></div><div class="info"><div class="n">Lime 700</div><div class="h">#6E9C1B</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--green-100)"></div><div class="info"><div class="n">Green 100</div><div class="h">#E1F2BF</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--green-300)"></div><div class="info"><div class="n">Green 300</div><div class="h">#A5D557</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--green-400)"></div><div class="info"><div class="n">Green 400 · hover</div><div class="h">#85BE26</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--green-500)"></div><div class="info"><div class="n">Green 500 · BRAND</div><div class="h">#68A605</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--green-600)"></div><div class="info"><div class="n">Green 600</div><div class="h">#578C07</div></div></div>
       </div>
 
-      <div class="preview-label">Ink — text &amp; dark surfaces</div>
+      <div class="preview-label">Forest — the gradient's deep end</div>
       <div class="swatch-grid" style="margin-bottom:22px;">
-        <div class="swatch"><div class="fill" style="background:var(--ink-900)"></div><div class="info"><div class="n">Ink 900</div><div class="h">#14150F</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--ink-700)"></div><div class="info"><div class="n">Ink 700</div><div class="h">#2B2F23</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--ink-500)"></div><div class="info"><div class="n">Ink 500</div><div class="h">#666B5B</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--ink-400)"></div><div class="info"><div class="n">Ink 400</div><div class="h">#8A8F80</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--ink-300)"></div><div class="info"><div class="n">Ink 300</div><div class="h">#AFB4A5</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--forest-500)"></div><div class="info"><div class="n">Forest 500</div><div class="h">#0E8A3A</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--forest-600)"></div><div class="info"><div class="n">Forest 600</div><div class="h">#087A31</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--forest-700)"></div><div class="info"><div class="n">Forest 700 · BRAND</div><div class="h">#066F2D</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--forest-800)"></div><div class="info"><div class="n">Forest 800</div><div class="h">#054F21</div></div></div>
+      </div>
+
+      <div class="preview-label">Navy — the "supa" wordmark</div>
+      <div class="swatch-grid" style="margin-bottom:22px;">
+        <div class="swatch"><div class="fill" style="background:var(--navy-900)"></div><div class="info"><div class="n">Navy 900 · BRAND</div><div class="h">#001834</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--navy-700)"></div><div class="info"><div class="n">Navy 700 · link</div><div class="h">#0D3A57</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--navy-500)"></div><div class="info"><div class="n">Navy 500 · secondary</div><div class="h">#40617D</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--navy-400)"></div><div class="info"><div class="n">Navy 400 · tertiary</div><div class="h">#5C7085</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--navy-300)"></div><div class="info"><div class="n">Navy 300 · borders</div><div class="h">#8492A0</div></div></div>
       </div>
 
       <div class="preview-label">Neutral — paper &amp; surfaces</div>
       <div class="swatch-grid" style="margin-bottom:22px;">
         <div class="swatch"><div class="fill" style="background:var(--neutral-000); border-bottom:1px solid var(--border-subtle);"></div><div class="info"><div class="n">Neutral 000</div><div class="h">#FFFFFF</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--neutral-50)"></div><div class="info"><div class="n">Neutral 50</div><div class="h">#F4F5F2</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--neutral-100)"></div><div class="info"><div class="n">Neutral 100</div><div class="h">#E9EBE5</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--neutral-200)"></div><div class="info"><div class="n">Neutral 200</div><div class="h">#D7DAD0</div></div></div>
-        <div class="swatch"><div class="fill" style="background:var(--neutral-300)"></div><div class="info"><div class="n">Neutral 300</div><div class="h">#C2C6B9</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-50)"></div><div class="info"><div class="n">Neutral 50</div><div class="h">#F7F9FA</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-100)"></div><div class="info"><div class="n">Neutral 100</div><div class="h">#EDF1F4</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-200)"></div><div class="info"><div class="n">Neutral 200</div><div class="h">#D8DFE6</div></div></div>
+        <div class="swatch"><div class="fill" style="background:var(--neutral-300)"></div><div class="info"><div class="n">Neutral 300</div><div class="h">#C2CCD6</div></div></div>
       </div>
+
+      <div class="note"><strong>The brand green is a fill, not a line.</strong> <code>--accent</code> (#68A605) carries navy text at 5.97:1, but on white it is only 2.98:1 — under the 3:1 that WCAG 1.4.11 asks of a UI boundary. So indicators, focus rings and control borders use <code>--accent-ink</code> (#066F2D, 6.33:1) instead, and a green button that needs <em>white</em> text uses <code>--accent-deep</code>. The brand colour is never altered to make a ratio work; where it does not fit, a different token does the job.</div>
 
       <div class="preview-label">Data · productivity zones</div>
       <div class="swatch-grid">
@@ -303,7 +329,7 @@
         <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-sm)"></div><div class="preview-label" style="margin-top:10px;">sm</div></div>
         <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-md)"></div><div class="preview-label" style="margin-top:10px;">md</div></div>
         <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-lg)"></div><div class="preview-label" style="margin-top:10px;">lg</div></div>
-        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-lime); background:var(--accent);"></div><div class="preview-label" style="margin-top:10px;">lime (CTA)</div></div>
+        <div style="text-align:center;"><div class="shadow-demo" style="box-shadow:var(--shadow-accent); background:var(--accent);"></div><div class="preview-label" style="margin-top:10px;">lime (CTA)</div></div>
       </div>
     </section>
 
@@ -326,22 +352,24 @@
 
     <!-- ===================== BUTTONS ===================== -->
     <section class="doc-section" id="buttons">
-      <div class="sec-head"><h2>Buttons</h2><p>Dark is the primary action color across the product; lime is reserved for the single highest-priority CTA on a screen.</p></div>
+      <div class="sec-head"><h2>Buttons</h2><p>Navy is the primary action colour across the product. <code>btn-accent</code> (the brand green) is reserved for the single highest-priority CTA on a screen and carries navy text; <code>btn-deep</code> is the same brand green at the gradient’s forest end, dark enough to carry <em>white</em> text — use it for form submits, where the bright green would shout.</p></div>
       <div class="preview preview-row">
         <button class="btn btn-dark">Confirm &amp; save log</button>
-        <button class="btn btn-lime">Try for free</button>
+        <button class="btn btn-accent">Try for free</button>
+        <button class="btn btn-deep">Create account</button>
         <button class="btn btn-white">Choose another</button>
         <button class="btn btn-ghost">Skip</button>
         <button class="btn btn-dark" disabled>Disabled</button>
       </div>
       <div class="preview preview-row">
         <button class="btn-icon btn-icon-dark"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
-        <button class="btn-icon btn-icon-lime"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+        <button class="btn-icon btn-icon-accent"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+        <button class="btn-icon btn-icon-deep"><svg class="icon"><use href="#i-check"/></svg></button>
         <button class="btn-icon btn-icon-white"><svg class="icon"><use href="#i-navigation"/></svg></button>
         <button class="btn-icon btn-icon-neutral"><svg class="icon"><use href="#i-x"/></svg></button>
-        <button class="btn-icon btn-icon-glass" style="background:var(--ink-700);"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+        <button class="btn-icon btn-icon-glass" style="background:var(--navy-700);"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
       </div>
-      <div class="spec-code"><span class="tag">&lt;button</span> <span class="cls">class="btn btn-dark"</span><span class="tag">&gt;</span>Confirm &amp; save log<span class="tag">&lt;/button&gt;</span><br><span class="tag">&lt;button</span> <span class="cls">class="btn-icon btn-icon-lime"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/button&gt;</span></div>
+      <div class="spec-code"><span class="tag">&lt;button</span> <span class="cls">class="btn btn-dark"</span><span class="tag">&gt;</span>Confirm &amp; save log<span class="tag">&lt;/button&gt;</span><br><span class="tag">&lt;button</span> <span class="cls">class="btn-icon btn-icon-accent"</span><span class="tag">&gt;</span>…<span class="tag">&lt;/button&gt;</span></div>
 
       <div class="sec-head" style="margin-top:38px;"><h3 style="font-size:17px;font-weight:700;letter-spacing:var(--tracking-tight);">Destructive</h3><p>For actions that lose work. <code>btn-danger</code> is the irreversible confirm itself; <code>btn-danger-soft</code> is for a destructive action that is not the loudest thing on the screen. Neither carries a glow — a delete button should never look like the thing you want tapped.</p></div>
       <div class="preview preview-row">
@@ -388,7 +416,7 @@
         <span class="chip chip-lime">Near</span>
         <span class="chip chip-live"><span class="dot"></span>Live</span>
       </div>
-      <div class="preview" style="background:var(--ink-900); padding:32px;">
+      <div class="preview" style="background:var(--navy-900); padding:32px;">
         <div class="tag-float" style="width:180px;">
           <div class="tag-label">High</div>
           <div class="tag-values">85 kg/h <span class="sub">4.5 ha</span></div>
@@ -424,7 +452,7 @@
       <div class="preview" style="max-width:420px;">
         <div class="t-stack" style="gap:10px;">
           <div class="card card-pad-sm list-row">
-            <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-notebook-pen"/></svg></div>
+            <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-notebook-pen"/></svg></div>
             <div class="lr-info"><div class="lr-value">3 logs today</div><div class="lr-sub">across Sections 1, 2 and 4</div></div>
             <svg class="icon" style="color:var(--text-tertiary);"><use href="#i-chevron-right"/></svg>
           </div>
@@ -448,7 +476,7 @@
           </div>
           <div class="meta">
             <div><div class="name">Corn field</div><div class="area">18 ha</div></div>
-            <button class="btn-icon btn-icon-lime btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+            <button class="btn-icon btn-icon-accent btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
           </div>
         </div>
         <div class="field-card" style="width:220px;">
@@ -457,11 +485,11 @@
           </div>
           <div class="meta">
             <div><div class="name">Empty field</div><div class="area">15 ha</div></div>
-            <button class="btn-icon btn-icon-lime btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+            <button class="btn-icon btn-icon-accent btn-icon-sm"><svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
           </div>
         </div>
       </div>
-      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="field-card"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="photo"</span><span class="tag">&gt;…&lt;/div&gt;&lt;div</span> <span class="cls">class="meta"</span><span class="tag">&gt;</span>name · area · <span class="cls">btn-icon-lime</span><span class="tag">&lt;/div&gt;&lt;/div&gt;</span></div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="field-card"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="photo"</span><span class="tag">&gt;…&lt;/div&gt;&lt;div</span> <span class="cls">class="meta"</span><span class="tag">&gt;</span>name · area · <span class="cls">btn-icon-accent</span><span class="tag">&lt;/div&gt;&lt;/div&gt;</span></div>
     </section>
 
     <!-- ===================== WEATHER CARD ===================== -->
@@ -579,10 +607,10 @@
         </div>
         <div class="hero-marketing" style="width:280px;">
           <div class="hm-copy">Boost <span class="chip chip-lime">agriculture</span> production through mechanization</div>
-          <button class="btn btn-lime btn-block">Try for free <svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
+          <button class="btn btn-accent btn-block">Try for free <svg class="icon"><use href="#i-arrow-up-right"/></svg></button>
         </div>
       </div>
-      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="hero-marketing"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="hm-copy"</span><span class="tag">&gt;</span>…<span class="tag">&lt;button</span> <span class="cls">class="btn btn-lime btn-block"</span><span class="tag">&gt;</span></div>
+      <div class="spec-code"><span class="tag">&lt;div</span> <span class="cls">class="hero-marketing"</span><span class="tag">&gt;&lt;div</span> <span class="cls">class="hm-copy"</span><span class="tag">&gt;</span>…<span class="tag">&lt;button</span> <span class="cls">class="btn btn-accent btn-block"</span><span class="tag">&gt;</span></div>
     </section>
 
     <!-- ===================== CTA RAIL ===================== -->
@@ -680,7 +708,7 @@
         <div class="card card-pad-sm" style="width:280px;">
           <div class="status-bar"><span>9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
         </div>
-        <div style="width:280px; background:var(--ink-900); border-radius:16px; padding:16px;">
+        <div style="width:280px; background:var(--navy-900); border-radius:16px; padding:16px;">
           <div class="status-bar on-dark"><span>9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
         </div>
       </div>

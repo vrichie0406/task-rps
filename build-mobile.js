@@ -29,7 +29,7 @@ const screens = grab(/<div class="phone-screen" id="app">([\s\S]*?)\s*<!-- @app-
 const sprite = grab(/(<svg xmlns="http:\/\/www\.w3\.org\/2000\/svg" style="display:none"[\s\S]*?<\/svg>)/, 'icon sprite');
 const script = grab(/<script>([\s\S]*?)<\/script>/, '<script> block');
 
-const css = ['tokens', 'textures', 'components']
+const css = ['tokens', 'brand', 'textures', 'components']
   .map(n => `/* ---- ${n}.css ---- */\n` + fs.readFileSync(path.join(root, 'design-system', `${n}.css`), 'utf8'))
   .join('\n');
 

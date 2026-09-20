@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="The PalmTrack farm-worker app — onboarding, home, voice capture, Anara processing and log review — built entirely from the Terra design system.">
 <link rel="stylesheet" href="design-system/tokens.css">
+<link rel="stylesheet" href="design-system/brand.css">
 <link rel="stylesheet" href="design-system/textures.css">
 <link rel="stylesheet" href="design-system/components.css">
 <style>
@@ -18,7 +19,7 @@
   /* ---- side panel (documentation rail, not part of the product) ---- */
   .panel{ width:300px; flex-shrink:0; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-xl); padding:26px; position:sticky; top:44px; }
   .panel .brand-row{ display:flex; align-items:center; gap:9px; margin-bottom:18px; }
-  .panel .mark{ width:26px; height:26px; border-radius:8px; background:var(--ink-900); display:flex; align-items:center; justify-content:center; }
+  .panel .mark{ width:26px; height:26px; border-radius:8px; background:var(--navy-900); display:flex; align-items:center; justify-content:center; }
   .panel .mark span{ width:10px; height:10px; border-radius:3px; background:var(--accent); display:block; }
   .panel .brand-name{ font-weight:700; font-size:14px; }
   .panel h1{ font-size:20px; font-weight:700; letter-spacing:var(--tracking-tight); margin:0 0 10px; }
@@ -31,16 +32,16 @@
     transition:background .12s, border-color .12s;
   }
   .jump-btn:hover{ border-color:var(--border-default); }
-  .jump-btn.is-current{ background:var(--lime-100); border-color:var(--lime-300); color:var(--ink-800); }
+  .jump-btn.is-current{ background:var(--green-100); border-color:var(--green-300); color:var(--navy-800); }
   .jump-btn .num{ min-width:18px; height:18px; border-radius:50%; background:var(--neutral-200); color:var(--text-secondary); font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-  .jump-btn.is-current .num{ background:var(--accent-strong); color:var(--neutral-000); }
+  .jump-btn.is-current .num{ background:var(--accent-deep); color:var(--neutral-000); }
   .panel .foot-hint{ margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle); font-size:11.5px; color:var(--text-tertiary); line-height:1.6; }
   .panel .foot-hint a{ color:var(--text-link); font-weight:700; text-decoration:none; }
 
   /* ---- phone frame ---- */
   .phone-wrap{ display:flex; flex-direction:column; align-items:center; gap:14px; }
-  .phone-frame{ width:390px; height:844px; background:var(--ink-900); border-radius:46px; padding:12px; box-shadow:var(--shadow-lg); position:relative; }
-  .phone-frame::before{ content:''; position:absolute; top:12px; left:50%; transform:translateX(-50%); width:120px; height:26px; background:var(--ink-900); border-radius:0 0 16px 16px; z-index:30; }
+  .phone-frame{ width:390px; height:844px; background:var(--navy-900); border-radius:46px; padding:12px; box-shadow:var(--shadow-lg); position:relative; }
+  .phone-frame::before{ content:''; position:absolute; top:12px; left:50%; transform:translateX(-50%); width:120px; height:26px; background:var(--navy-900); border-radius:0 0 16px 16px; z-index:30; }
   .phone-screen{ width:100%; height:100%; background:var(--surface); border-radius:36px; overflow:hidden; position:relative; }
   .phone-caption{ font-size:12px; color:var(--text-tertiary); font-weight:600; }
   @media (max-width:900px){
@@ -58,13 +59,83 @@
   .scroll-body > *{ flex-shrink:0; }
   .sb-pad{ padding-top:16px; }
 
-  /* ---- Onboarding ---- */
+
+  /* ---- Splash ---- */
+  #screen-splash{ background:var(--bg-canvas); }
+  .splash-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:0 32px; position:relative; }
+  .splash-wrap::before{
+    content:''; position:absolute; inset:0; pointer-events:none; opacity:.30;
+    background-image:var(--tex-topo); background-size:cover; background-position:38% 30%;
+    -webkit-mask-image:radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+            mask-image:radial-gradient(circle at 50% 45%, #000 0%, transparent 72%);
+  }
+  .splash-wrap > *{ position:relative; z-index:1; }
+  .splash-tag{ font-size:var(--text-md); font-weight:600; color:var(--text-secondary); text-align:center; }
+  .splash-rule{ width:56px; }
+  .splash-foot{ position:absolute; bottom:38px; left:0; right:0; display:flex; flex-direction:column; align-items:center; gap:14px; z-index:1; }
+  .splash-bar{ width:132px; height:3px; border-radius:var(--radius-full); background:var(--neutral-200); overflow:hidden; }
+  .splash-bar i{ display:block; height:100%; width:38%; border-radius:inherit; background:var(--brand-gradient); animation:sf-load 1.25s var(--ease-standard) infinite; }
+  @keyframes sf-load{ 0%{ transform:translateX(-100%);} 100%{ transform:translateX(320%);} }
+
+  /* ---- Onboarding carousel ---- */
+  #screen-intro{ background:var(--surface); }
+  .intro-media{ position:relative; height:44%; min-height:230px; flex-shrink:0; background-size:cover; background-position:center; transition:background-image var(--duration-slow); }
+  .intro-media::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,24,52,.05) 40%, rgba(0,24,52,.55) 100%); }
+  .intro-skip{ position:absolute; top:16px; right:16px; z-index:2; }
+  .intro-body{ flex:1; display:flex; flex-direction:column; padding:26px 24px 0; gap:10px; }
+  .intro-title{ font-size:var(--text-2xl); font-weight:700; letter-spacing:var(--tracking-tight); line-height:1.2; }
+  .intro-copy{ font-size:var(--text-base); color:var(--text-secondary); line-height:1.6; }
+  .intro-dots{ display:flex; gap:7px; margin-top:auto; padding-bottom:4px; }
+  .intro-dots i{ width:7px; height:7px; border-radius:50%; background:var(--neutral-200); transition:width var(--duration-base), background var(--duration-base); }
+  .intro-dots i.is-on{ width:22px; background:var(--accent-ink); }
+
+  /* ---- Auth (login + sign up) ---- */
+  .auth-head{ display:flex; flex-direction:column; gap:6px; padding:2px 0 6px; }
+  .auth-title{ font-size:var(--text-2xl); font-weight:700; letter-spacing:var(--tracking-tight); }
+  .auth-sub{ font-size:var(--text-base); color:var(--text-secondary); line-height:1.55; }
+  .auth-form{ display:flex; flex-direction:column; gap:15px; }
+  #screen-login .scroll-body, #screen-signup .scroll-body{ gap:10px; }
+  .input-wrap{ position:relative; display:flex; align-items:center; }
+  .input-wrap > svg.icon{ position:absolute; left:15px; color:var(--text-tertiary); font-size:17px; pointer-events:none; }
+  .input-wrap .input{ padding-left:44px; }
+  .input-wrap.has-affix .input{ padding-right:48px; }
+  .input-affix{ position:absolute; right:6px; background:none; border:none; cursor:pointer; color:var(--text-secondary); width:38px; height:38px; border-radius:var(--radius-full); display:flex; align-items:center; justify-content:center; font-family:inherit; }
+  .input-affix:hover{ color:var(--text-primary); background:var(--neutral-100); }
+  .dial{ display:flex; align-items:center; gap:8px; padding:13px 0 13px 44px; font-size:var(--text-base); font-weight:700; color:var(--text-primary); flex-shrink:0; }
+  .input-wrap.is-phone .input{ padding-left:8px; }
+  .input-wrap.is-phone{ background:var(--surface); border:1px solid var(--border-control); border-radius:var(--radius-md); }
+  .input-wrap.is-phone .input{ border:none; background:transparent; }
+  .input-wrap.is-phone:focus-within{ border-color:var(--accent-ink); box-shadow:0 0 0 3px var(--accent-soft); }
+  .input-wrap.is-phone .input:focus{ box-shadow:none; }
+  .field-note{ font-size:var(--text-xs); color:var(--text-tertiary); }
+  .field-error{ display:none; align-items:center; gap:6px; font-size:var(--text-xs); font-weight:700; color:var(--text-danger); }
+  .field.is-invalid .field-error{ display:flex; }
+  .field.is-invalid .input, .field.is-invalid .input-wrap.is-phone{ border-color:var(--danger); }
+  .auth-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .auth-sep{ display:flex; align-items:center; gap:12px; color:var(--text-tertiary); font-size:var(--text-xs); font-weight:700; }
+  .auth-sep::before, .auth-sep::after{ content:''; height:1px; flex:1; background:var(--border-subtle); }
+  .auth-alt{ text-align:center; font-size:var(--text-sm); color:var(--text-secondary); }
+  .auth-alt button{ background:none; border:none; font-family:inherit; font-size:inherit; font-weight:700; color:var(--accent-ink); cursor:pointer; padding:0; text-decoration:underline; text-underline-offset:2px; }
+  /* Checkbox is a UI component — the box needs a 3:1 boundary */
+  .check-row{ display:flex; align-items:flex-start; gap:11px; font-size:var(--text-sm); color:var(--text-secondary); line-height:1.5; }
+  .check-row input{ appearance:none; width:20px; height:20px; flex-shrink:0; margin-top:1px; cursor:pointer;
+    border:1.5px solid var(--border-control); border-radius:6px; background:var(--surface); position:relative; }
+  .check-row input:checked{ background:var(--accent-deep); border-color:var(--accent-deep); }
+  .check-row input:checked::after{ content:''; position:absolute; left:6px; top:2px; width:5px; height:10px;
+    border:solid var(--neutral-000); border-width:0 2px 2px 0; transform:rotate(45deg); }
+  .check-row input:focus-visible{ outline:2px solid var(--accent-ink); outline-offset:2px; }
+  .check-row a{ color:var(--accent-ink); font-weight:700; }
+  .pw-meter{ display:flex; gap:4px; margin-top:8px; }
+  .pw-meter i{ height:4px; flex:1; border-radius:var(--radius-full); background:var(--neutral-200); transition:background var(--duration-base); }
+  .pw-label{ font-size:var(--text-xs); font-weight:700; margin-top:6px; color:var(--text-tertiary); }
+
+  /* ---- Onboarding (language) ---- */
   #screen-onboarding .scroll-body{ background:var(--bg-canvas); padding-top:8px; padding-bottom:20px; }
   .ob-hero{ height:150px; border-radius:var(--radius-xl); background-image:var(--tex-corn-field); background-size:cover; background-position:center; position:relative; overflow:hidden; display:flex; align-items:flex-end; padding:16px; }
   .ob-hero::before{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(10,14,6,.05), rgba(8,12,5,.62)); }
   .ob-hero .chip{ position:relative; z-index:1; }
-  .ob-invite{ display:flex; align-items:center; gap:10px; background:var(--lime-50); border:1px solid var(--lime-300); border-radius:var(--radius-md); padding:11px 13px; font-size:12.5px; color:var(--ink-700); line-height:1.45; }
-  .ob-invite svg{ color:var(--lime-700); flex-shrink:0; }
+  .ob-invite{ display:flex; align-items:center; gap:10px; background:var(--green-50); border:1px solid var(--green-300); border-radius:var(--radius-md); padding:11px 13px; font-size:12.5px; color:var(--navy-700); line-height:1.45; }
+  .ob-invite svg{ color:var(--accent-ink); flex-shrink:0; }
   .lang-list{ display:flex; flex-direction:column; gap:8px; }
   .lang-opt{
     display:flex; align-items:center; gap:12px; width:100%; font-family:inherit; cursor:pointer; text-align:left;
@@ -73,8 +144,8 @@
   }
   .lang-opt .lang-native{ font-size:15px; font-weight:700; color:var(--text-primary); }
   .lang-opt .lang-en{ font-size:12px; color:var(--text-secondary); margin-top:1px; }
-  .lang-opt .lang-tick{ margin-left:auto; color:var(--accent-strong); opacity:0; flex-shrink:0; }
-  .lang-opt.is-selected{ border-color:var(--accent); background:var(--lime-50); }
+  .lang-opt .lang-tick{ margin-left:auto; color:var(--accent-ink); opacity:0; flex-shrink:0; }
+  .lang-opt.is-selected{ border-color:var(--accent); background:var(--green-50); }
   .lang-opt.is-selected .lang-tick{ opacity:1; }
   .screen-footer{ flex-shrink:0; background:var(--surface); border-top:1px solid var(--border-subtle); padding:12px 20px; }
 
@@ -89,19 +160,19 @@
   /* Big log task button — a voice button with a plus, per the flow map */
   .log-hot-btn{
     position:relative; width:100%; border:none; cursor:pointer; font-family:inherit;
-    background:var(--accent); color:var(--text-on-lime); border-radius:var(--radius-xl);
+    background:var(--accent); color:var(--text-on-accent); border-radius:var(--radius-xl);
     padding:18px 20px; display:flex; align-items:center; gap:14px; text-align:left;
-    box-shadow:var(--shadow-lime); transition:transform var(--duration-fast) var(--ease-standard), background var(--duration-fast);
+    box-shadow:var(--shadow-accent); transition:transform var(--duration-fast) var(--ease-standard), background var(--duration-fast);
   }
   .log-hot-btn:active{ transform:scale(.985); }
-  .log-hot-btn:hover{ background:var(--accent-strong); }
-  .log-hot-btn .hot-mic{ width:52px; height:52px; border-radius:50%; background:var(--ink-900); color:var(--neutral-000); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:relative; }
-  .log-hot-btn .hot-plus{ position:absolute; right:-3px; bottom:-3px; width:22px; height:22px; border-radius:50%; background:var(--neutral-000); color:var(--ink-900); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .log-hot-btn:hover{ background:var(--accent-hover); }
+  .log-hot-btn .hot-mic{ width:52px; height:52px; border-radius:50%; background:var(--navy-900); color:var(--neutral-000); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; position:relative; }
+  .log-hot-btn .hot-plus{ position:absolute; right:-3px; bottom:-3px; width:22px; height:22px; border-radius:50%; background:var(--neutral-000); color:var(--navy-900); border:2px solid var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; }
   .log-hot-btn .hot-title{ font-size:17px; font-weight:700; letter-spacing:var(--tracking-tight); }
-  .log-hot-btn .hot-sub{ font-size:12.5px; font-weight:600; color:var(--ink-700); margin-top:2px; }
+  .log-hot-btn .hot-sub{ font-size:12.5px; font-weight:600; color:var(--navy-700); margin-top:2px; }
 
   /* ---- Capture ---- */
-  #screen-capture{ background:var(--ink-900); }
+  #screen-capture{ background:var(--navy-900); }
   .cap-stage{ flex:1; display:flex; flex-direction:column; min-height:0; }
   .cap-view{ position:relative; flex:1; min-height:0; background-image:var(--tex-crop-closeup); background-size:cover; background-position:center; }
   .cap-topbar{ position:absolute; top:0; left:0; right:0; z-index:3; display:flex; align-items:center; justify-content:space-between; padding:14px 16px; }
@@ -110,27 +181,27 @@
   .cap-shot-preview.is-visible{ opacity:1; }
   .lens-toggle{ position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:3; background:rgba(0,0,0,.45); backdrop-filter:blur(6px); }
   .lens-toggle .pill-opt{ color:rgba(255,255,255,.72); white-space:nowrap; padding:8px 15px; }
-  .lens-toggle .pill-opt.is-active{ background:var(--accent); color:var(--text-on-lime); }
+  .lens-toggle .pill-opt.is-active{ background:var(--accent); color:var(--text-on-accent); }
 
   /* The record card is the .record-hero component, docked to the bottom of capture */
   .cap-record{ flex-shrink:0; padding:10px 12px 22px; }
   .cap-record .record-hero{ gap:9px; padding:16px var(--space-5) 14px; }
   .cap-record .rh-wave{ height:44px; }
   .rh-controls .ctl{ display:flex; flex-direction:column; align-items:center; gap:5px; }
-  .rh-controls .ctl-label{ font-size:10.5px; font-weight:700; color:var(--ink-600); }
+  .rh-controls .ctl-label{ font-size:10.5px; font-weight:700; color:var(--navy-600); }
   .stop-square{ width:22px; height:22px; border-radius:5px; background:var(--neutral-000); }
 
   /* ---- Processing ---- */
   #screen-processing{ background:var(--bg-canvas); }
   .proc-wrap{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; padding:0 32px; text-align:center; }
-  .proc-ring{ width:88px; height:88px; border-radius:50%; background:var(--lime-100); display:flex; align-items:center; justify-content:center; color:var(--lime-700); font-size:34px; position:relative; }
+  .proc-ring{ width:88px; height:88px; border-radius:50%; background:var(--green-100); display:flex; align-items:center; justify-content:center; color:var(--accent-ink); font-size:34px; position:relative; }
   .proc-ring::after{ content:''; position:absolute; inset:-6px; border-radius:50%; border:2.5px solid var(--accent); border-top-color:transparent; border-left-color:transparent; animation:terra-spin 1s linear infinite; }
   @keyframes terra-spin{ to{ transform:rotate(360deg); } }
   .proc-steps{ width:100%; display:flex; flex-direction:column; gap:8px; margin-top:6px; }
   .proc-step{ display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:11px 14px; font-size:13px; font-weight:600; color:var(--text-tertiary); text-align:left; transition:color var(--duration-base), border-color var(--duration-base); }
   .proc-step .ps-dot{ width:18px; height:18px; border-radius:50%; background:var(--neutral-150); color:var(--neutral-000); display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; transition:background var(--duration-base); }
-  .proc-step.is-done{ color:var(--text-primary); border-color:var(--lime-300); }
-  .proc-step.is-done .ps-dot{ background:var(--accent-strong); }
+  .proc-step.is-done{ color:var(--text-primary); border-color:var(--green-300); }
+  .proc-step.is-done .ps-dot{ background:var(--accent-deep); }
 
   /* ---- Review ---- */
   #screen-review .scroll-body{ background:var(--bg-canvas); padding-top:6px; padding-bottom:20px; }
@@ -139,19 +210,19 @@
   .transcript-head{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
   .voice-mini-wave{ display:flex; align-items:center; gap:2.5px; height:26px; flex:1; }
   .voice-mini-wave .b{ width:2.5px; border-radius:2px; background:var(--neutral-300); }
-  .voice-mini-wave .b.hi{ background:var(--lime-600); }
+  .voice-mini-wave .b.hi{ background:var(--green-600); }
   .transcript-block{ background:var(--surface-sunken); border-radius:var(--radius-md); padding:13px; }
-  .transcript-block blockquote{ font-size:13.5px; color:var(--ink-700); line-height:1.6; font-style:italic; margin:6px 0 0; }
+  .transcript-block blockquote{ font-size:13.5px; color:var(--navy-700); line-height:1.6; font-style:italic; margin:6px 0 0; }
   .photos-row{ display:flex; align-items:center; gap:8px; margin-top:12px; }
   .thumb-add{ width:60px; height:60px; border-radius:var(--radius-md); flex-shrink:0; background:var(--surface-sunken); border:1.5px dashed var(--border-default); color:var(--text-secondary); display:flex; align-items:center; justify-content:center; font-size:18px; cursor:pointer; font-family:inherit; }
-  .thumb-add:hover{ border-color:var(--accent); color:var(--lime-700); }
+  .thumb-add:hover{ border-color:var(--accent); color:var(--accent-ink); }
   .sorted-row{ display:flex; align-items:center; gap:12px; padding:13px 0; border-bottom:1px solid var(--border-subtle); }
   .sorted-row:last-child{ border-bottom:none; }
   .sorted-thumb{ width:46px; height:46px; border-radius:var(--radius-md); flex-shrink:0; background-size:cover; background-position:center; position:relative; overflow:hidden; }
   .sorted-thumb .pin{ position:absolute; top:50%; left:50%; transform:translate(-50%,-58%); color:var(--red-500); font-size:17px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
-  .sorted-tile{ width:46px; height:46px; border-radius:var(--radius-md); flex-shrink:0; background:var(--lime-100); color:var(--lime-700); display:flex; align-items:center; justify-content:center; font-size:19px; }
+  .sorted-tile{ width:46px; height:46px; border-radius:var(--radius-md); flex-shrink:0; background:var(--green-100); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:19px; }
   .anara-note{ display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-tertiary); margin-top:2px; }
-  .anara-note svg{ color:var(--lime-600); }
+  .anara-note svg{ color:var(--green-600); }
 
   /* ---- Saved ---- */
   #screen-saved .scroll-body{ background:var(--surface); padding-top:10px; padding-bottom:24px; }
@@ -175,11 +246,11 @@
   .stat-cell{ background:var(--surface-sunken); border-radius:var(--radius-md); padding:13px 10px; text-align:center; }
   .stat-cell .sc-val{ font-size:21px; font-weight:700; letter-spacing:var(--tracking-tight); }
   .stat-cell .sc-label{ font-size:10.5px; font-weight:700; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:.04em; margin-top:3px; }
-  .anara-hero{ position:relative; border-radius:var(--radius-xl); overflow:hidden; padding:22px 20px; background:linear-gradient(165deg, var(--lime-50) 0%, var(--lime-300) 100%); }
+  .anara-hero{ position:relative; border-radius:var(--radius-xl); overflow:hidden; padding:22px 20px; background:linear-gradient(165deg, var(--green-50) 0%, var(--green-300) 100%); }
   .anara-hero::after{ content:''; position:absolute; inset:0; opacity:.28; pointer-events:none; background-image:var(--tex-topo); background-size:cover; background-position:20% 30%; }
   .anara-hero > *{ position:relative; z-index:1; }
   .anara-hero .ah-title{ font-size:22px; font-weight:700; letter-spacing:var(--tracking-tight); margin-top:12px; }
-  .anara-hero .ah-sub{ font-size:13px; color:var(--ink-600); line-height:1.55; margin-top:6px; }
+  .anara-hero .ah-sub{ font-size:13px; color:var(--navy-600); line-height:1.55; margin-top:6px; }
   .cap-list .list-row{ padding:13px 0; border-bottom:1px solid var(--border-subtle); }
   .cap-list .list-row:last-child{ border-bottom:none; }
 
@@ -197,8 +268,14 @@
     <h1>Farm worker app</h1>
     <p class="desc">The PalmTrack farm-worker flow — invite, onboarding, home, voice capture, Anara processing and log review — composed entirely from documented Terra components.</p>
 
+    <div class="group-label">Get in</div>
+    <button class="jump-btn" data-jump="splash"><span class="num">①</span> Splash</button>
+    <button class="jump-btn" data-jump="intro"><span class="num">②</span> Onboarding</button>
+    <button class="jump-btn" data-jump="login"><span class="num">③</span> Log in</button>
+    <button class="jump-btn" data-jump="signup"><span class="num">④</span> Sign up</button>
+
     <div class="group-label">Walk the flow</div>
-    <button class="jump-btn" data-jump="onboarding"><span class="num">①</span> Onboarding — language</button>
+    <button class="jump-btn" data-jump="onboarding"><span class="num">①</span> Language</button>
     <button class="jump-btn" data-jump="home"><span class="num">②</span> Home page</button>
     <button class="jump-btn" data-jump="capture"><span class="num">③</span> Capture — voice + camera</button>
     <button class="jump-btn" data-jump="processing"><span class="num">④</span> Processing audio &amp; images</button>
@@ -216,6 +293,155 @@
   <div class="phone-wrap">
     <div class="phone-frame">
       <div class="phone-screen" id="app">
+
+
+        <!-- ============================================================
+             SPLASH — the wordmark, on a light ground so the navy half reads
+             ============================================================ -->
+        <section class="screen is-active" id="screen-splash">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+          <div class="splash-wrap">
+            <div class="brand-logo" role="img" aria-label="SupaFarm"></div>
+            <div class="brand-rule splash-rule"></div>
+            <p class="splash-tag">Log the field by voice.<br>Anara does the paperwork.</p>
+          </div>
+          <div class="splash-foot">
+            <div class="splash-bar" role="progressbar" aria-label="Loading"><i></i></div>
+            <span class="t-eyebrow">Green Acres Estate</span>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             ONBOARDING — what the app does, before we ask for anything
+             ============================================================ -->
+        <section class="screen" id="screen-intro">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+          <div class="intro-media" id="intro-media">
+            <button class="btn btn-white btn-sm intro-skip" data-go="login">Skip</button>
+          </div>
+          <div class="intro-body">
+            <span class="t-eyebrow" id="intro-step">Step 1 of 3</span>
+            <h1 class="intro-title" id="intro-title">Just talk. We&rsquo;ll write it down.</h1>
+            <p class="intro-copy" id="intro-copy">Hold the phone up and say what you did. No forms, no typing, no waiting until you&rsquo;re back at the office.</p>
+            <div class="intro-dots" id="intro-dots"><i class="is-on"></i><i></i><i></i></div>
+          </div>
+          <div class="screen-footer">
+            <button class="btn btn-deep btn-block" id="intro-next">Next <svg class="icon"><use href="#i-arrow-right"/></svg></button>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             LOG IN
+             ============================================================ -->
+        <section class="screen" id="screen-login">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+          <div class="rev-topbar">
+            <button class="btn-icon btn-icon-neutral btn-icon-sm" data-go="intro" aria-label="Back"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+            <div class="brand-logo brand-logo-sm" role="img" aria-label="SupaFarm" style="margin:0 auto;"></div>
+            <span style="width:36px;"></span>
+          </div>
+
+          <div class="scroll-body px">
+            <div class="auth-head">
+              <h1 class="auth-title">Welcome back</h1>
+              <p class="auth-sub">Log in with the number your manager invited.</p>
+            </div>
+
+            <form class="auth-form" id="login-form" novalidate>
+              <div class="field" id="lf-phone">
+                <label class="field-label" for="li-phone">Phone number</label>
+                <div class="input-wrap is-phone">
+                  <span class="dial"><svg class="icon"><use href="#i-phone"/></svg> +91</span>
+                  <input class="input" id="li-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210">
+                </div>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Enter the 10-digit number you were invited on.</span>
+              </div>
+
+              <div class="field" id="lf-pw">
+                <div class="auth-row">
+                  <label class="field-label" for="li-pw">Password</label>
+                  <button type="button" class="lr-action" data-go="login">Forgot?</button>
+                </div>
+                <div class="input-wrap has-affix">
+                  <svg class="icon"><use href="#i-lock"/></svg>
+                  <input class="input" id="li-pw" type="password" autocomplete="current-password" placeholder="Your password">
+                  <button type="button" class="input-affix" data-pw-toggle aria-label="Show password"><svg class="icon"><use href="#i-eye"/></svg></button>
+                </div>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Enter your password to continue.</span>
+              </div>
+
+              <button class="btn btn-deep btn-block" type="submit">Log in</button>
+            </form>
+
+            <div class="auth-sep" style="margin:18px 0;">or</div>
+            <button class="btn btn-white btn-block"><svg class="icon"><use href="#i-message-circle"/></svg> Continue with WhatsApp</button>
+            <p class="auth-alt" style="margin:18px 0 0;">New to SupaFarm? <button data-go="signup">Create an account</button></p>
+          </div>
+        </section>
+
+        <!-- ============================================================
+             SIGN UP
+             ============================================================ -->
+        <section class="screen" id="screen-signup">
+          <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
+          <div class="rev-topbar">
+            <button class="btn-icon btn-icon-neutral btn-icon-sm" data-go="login" aria-label="Back"><svg class="icon"><use href="#i-arrow-left"/></svg></button>
+            <div class="brand-logo brand-logo-sm" role="img" aria-label="SupaFarm" style="margin:0 auto;"></div>
+            <span style="width:36px;"></span>
+          </div>
+
+          <div class="scroll-body px">
+            <div class="auth-head">
+              <h1 class="auth-title">Create your account</h1>
+              <p class="auth-sub">Takes a minute. You&rsquo;ll pick your language next.</p>
+            </div>
+
+            <form class="auth-form" id="signup-form" novalidate>
+              <div class="field" id="sf-name">
+                <label class="field-label" for="su-name">Full name</label>
+                <div class="input-wrap">
+                  <svg class="icon"><use href="#i-user"/></svg>
+                  <input class="input" id="su-name" type="text" autocomplete="name" placeholder="Rahul Kumar">
+                </div>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Tell us what to call you.</span>
+              </div>
+
+              <div class="field" id="sf-phone">
+                <label class="field-label" for="su-phone">Phone number</label>
+                <div class="input-wrap is-phone">
+                  <span class="dial"><svg class="icon"><use href="#i-phone"/></svg> +91</span>
+                  <input class="input" id="su-phone" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210">
+                </div>
+                <span class="field-note">We&rsquo;ll send a one-time code to confirm it.</span>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Enter a 10-digit mobile number.</span>
+              </div>
+
+              <div class="field" id="sf-pw">
+                <label class="field-label" for="su-pw">Password</label>
+                <div class="input-wrap has-affix">
+                  <svg class="icon"><use href="#i-lock"/></svg>
+                  <input class="input" id="su-pw" type="password" autocomplete="new-password" placeholder="At least 8 characters">
+                  <button type="button" class="input-affix" data-pw-toggle aria-label="Show password"><svg class="icon"><use href="#i-eye"/></svg></button>
+                </div>
+                <div class="pw-meter" id="pw-meter" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+                <span class="pw-label" id="pw-label">Use 8 characters or more</span>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Passwords need at least 8 characters.</span>
+              </div>
+
+              <div class="field" id="sf-terms">
+                <label class="check-row">
+                  <input type="checkbox" id="su-terms">
+                  <span>I agree to the <a href="#terms">Terms</a> and <a href="#privacy">Privacy Policy</a>.</span>
+                </label>
+                <span class="field-error"><svg class="icon"><use href="#i-info"/></svg> Please accept the terms to continue.</span>
+              </div>
+
+              <button class="btn btn-deep btn-block" type="submit">Create account</button>
+            </form>
+
+            <p class="auth-alt" style="margin:18px 0 0;">Already have an account? <button data-go="login">Log in</button></p>
+          </div>
+        </section>
 
         <!-- ============================================================
              ① ONBOARDING — opened from the manager's WhatsApp invite
@@ -271,7 +497,7 @@
         <!-- ============================================================
              ② HOME — welcome, farm view, big log task button
              ============================================================ -->
-        <section class="screen is-active" id="screen-home">
+        <section class="screen" id="screen-home">
           <div class="status-bar px" style="padding-top:16px;"><span class="t-mono-stat" id="time-home">9:41</span><span class="sb-icons"><svg class="icon"><use href="#i-signal"/></svg><svg class="icon"><use href="#i-wifi"/></svg><svg class="icon"><use href="#i-battery-full"/></svg></span></div>
 
           <div class="scroll-body px">
@@ -320,7 +546,7 @@
                 <button class="lr-action" data-tab="tasks">View all <svg class="icon"><use href="#i-chevron-right"/></svg></button>
               </div>
               <div class="card card-pad-sm list-row" style="margin-bottom:8px;">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-droplet"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-droplet"/></svg></div>
                 <div class="lr-info">
                   <div class="lr-value">Irrigation check</div>
                   <div class="lr-sub">Section 1 · Block A · 2h ago</div>
@@ -431,7 +657,7 @@
             <!-- Transcribed voice-to-text, with a speaker to listen back -->
             <div class="card card-pad">
               <div class="transcript-head">
-                <button class="btn-icon btn-icon-lime btn-icon-sm" id="btn-listen" aria-label="Listen to the recording"><svg class="icon"><use href="#i-volume-2"/></svg></button>
+                <button class="btn-icon btn-icon-accent btn-icon-sm" id="btn-listen" aria-label="Listen to the recording"><svg class="icon"><use href="#i-volume-2"/></svg></button>
                 <div class="voice-mini-wave" id="rev-wave"></div>
                 <span class="t-caption t-mono-stat">0:42</span>
               </div>
@@ -492,7 +718,7 @@
           </div>
 
           <div class="screen-footer">
-            <button class="btn btn-lime btn-block" data-go="saved"><svg class="icon"><use href="#i-check"/></svg> Confirm &amp; save log</button>
+            <button class="btn btn-accent btn-block" data-go="saved"><svg class="icon"><use href="#i-check"/></svg> Confirm &amp; save log</button>
           </div>
         </section>
 
@@ -511,15 +737,15 @@
 
             <div class="routed-list">
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
                 <div class="lr-info"><div class="lr-label">Filed under</div><div class="lr-value">Section 1 · Block A</div></div>
               </div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-sprout"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-sprout"/></svg></div>
                 <div class="lr-info"><div class="lr-label">Crop</div><div class="lr-value">Corn · Row 3</div></div>
               </div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
                 <div class="lr-info"><div class="lr-label">Category</div><div class="lr-value">Spraying · Leaf inspection</div></div>
               </div>
             </div>
@@ -556,7 +782,7 @@
               <span class="chip">Pending</span>
             </div>
             <div class="card card-pad-sm task-row">
-              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-droplet"/></svg></div>
+              <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-droplet"/></svg></div>
               <div class="tr-info">
                 <div class="tr-title">Irrigation check — Section 3</div>
                 <div class="tr-meta">Due tomorrow · Block B</div>
@@ -566,7 +792,7 @@
 
             <div class="t-label" style="margin-top:6px;">Logged by you</div>
             <div class="card card-pad-sm task-row" style="margin-bottom:8px;">
-              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-check"/></svg></div>
               <div class="tr-info">
                 <div class="tr-title">Spraying · Leaf inspection</div>
                 <div class="tr-meta">Section 1 · Block A · 9:41 AM</div>
@@ -574,7 +800,7 @@
               <span class="chip chip-lime">Saved</span>
             </div>
             <div class="card card-pad-sm task-row" style="margin-bottom:8px;">
-              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-check"/></svg></div>
               <div class="tr-info">
                 <div class="tr-title">Fertiliser application</div>
                 <div class="tr-meta">Section 3 · Block B · Yesterday</div>
@@ -582,7 +808,7 @@
               <span class="chip chip-lime">Saved</span>
             </div>
             <div class="card card-pad-sm task-row">
-              <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-check"/></svg></div>
+              <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-check"/></svg></div>
               <div class="tr-info">
                 <div class="tr-title">Soil moisture reading</div>
                 <div class="tr-meta">Section 1 · Block A · Yesterday</div>
@@ -659,19 +885,19 @@
             <div class="card card-pad cap-list">
               <div class="t-label" style="margin-bottom:2px;">What Anara does for each log</div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-mic"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-mic"/></svg></div>
                 <div class="lr-info"><div class="lr-value">Transcribes your voice</div><div class="lr-sub">In your chosen language, word for word</div></div>
               </div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-image"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-image"/></svg></div>
                 <div class="lr-info"><div class="lr-value">Reads your photos</div><div class="lr-sub">Spots the crop, the row and the problem</div></div>
               </div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-map-pin"/></svg></div>
                 <div class="lr-info"><div class="lr-value">Sorts the location</div><div class="lr-sub">Matches GPS to the right section and block</div></div>
               </div>
               <div class="list-row">
-                <div class="lr-tile" style="background:var(--lime-100); color:var(--lime-700);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
+                <div class="lr-tile" style="background:var(--green-100); color:var(--accent-ink);"><svg class="icon"><use href="#i-clipboard-check"/></svg></div>
                 <div class="lr-info"><div class="lr-value">Picks the category</div><div class="lr-sub">Identified from your voice and images together</div></div>
               </div>
             </div>
@@ -680,7 +906,7 @@
               <span class="sp-icon"><svg class="icon"><use href="#i-info"/></svg></span>
               <div class="sp-title">You always get the last word</div>
               <div class="sp-desc">Every field Anara fills in is editable on the review screen before you save.</div>
-              <button class="btn btn-lime btn-sm" data-go="capture">Start a log</button>
+              <button class="btn btn-accent btn-sm" data-go="capture">Start a log</button>
             </div>
           </div>
 
@@ -703,6 +929,12 @@
 <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></symbol>
 <symbol id="i-clipboard-check" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1" /> <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /> <path d="m9 14 2 2 4-4" /></symbol>
 <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" /></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" /> <circle cx="12" cy="12" r="3" /></symbol>
+<symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49" /> <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242" /> <path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143" /> <path d="m2 2 20 20" /></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2" /> <path d="M7 11V7a5 5 0 0 1 10 0v4" /></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384" /></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14" /> <path d="m12 5 7 7-7 7" /></symbol>
+<symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></symbol>
 <symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" /> <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></symbol>
 <symbol id="i-image" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /> <circle cx="9" cy="9" r="2" /> <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" /></symbol>
 <symbol id="i-images" viewBox="0 0 24 24"><path d="m22 11-1.296-1.296a2.4 2.4 0 0 0-3.408 0L11 16" /> <path d="M4 8a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2" /> <circle cx="13" cy="7" r="1" fill="currentColor" /> <rect x="8" y="2" width="14" height="14" rx="2" /></symbol>
@@ -763,6 +995,7 @@
     });
     jumps.forEach(function(j){ j.classList.toggle('is-current', j.dataset.jump === id); });
 
+    if(id === 'splash') runSplash();
     if(id === 'capture') startCapture();
     if(id === 'processing') runProcessing();
   }
@@ -938,7 +1171,116 @@
   tickClock();
   setInterval(tickClock, 20000);
 
-  show('home');
+
+  /* ---------- Splash: hold, then hand off to onboarding ---------- */
+  var splashTimer = null;
+  function runSplash(){
+    clearTimeout(splashTimer);
+    splashTimer = setTimeout(function(){ if(current === 'splash') show('intro'); }, 2100);
+  }
+
+  /* ---------- Onboarding carousel ---------- */
+  var INTRO = [
+    { t:'Just talk. We\u2019ll write it down.',
+      c:'Hold the phone up and say what you did. No forms, no typing, no waiting until you\u2019re back at the office.',
+      tex:'--tex-crop-closeup' },
+    { t:'Snap what you see.',
+      c:'Photos and video attach themselves to the log. Anara reads them to work out the crop, the row and the problem.',
+      tex:'--tex-corn-field' },
+    { t:'It files itself.',
+      c:'Location, tree and category are sorted for you. Check it once, save it, and your manager sees it straight away.',
+      tex:'--tex-aerial-plots' }
+  ];
+  var introAt = 0;
+  var introMedia = document.getElementById('intro-media');
+  var introTitle = document.getElementById('intro-title');
+  var introCopy  = document.getElementById('intro-copy');
+  var introStep  = document.getElementById('intro-step');
+  var introDots  = document.getElementById('intro-dots');
+  var introNext  = document.getElementById('intro-next');
+
+  function paintIntro(){
+    var it = INTRO[introAt];
+    introMedia.style.backgroundImage = 'var(' + it.tex + ')';
+    introTitle.textContent = it.t;
+    introCopy.textContent = it.c;
+    introStep.textContent = 'Step ' + (introAt + 1) + ' of ' + INTRO.length;
+    [].forEach.call(introDots.children, function(d, i){ d.classList.toggle('is-on', i === introAt); });
+    introNext.innerHTML = introAt === INTRO.length - 1
+      ? 'Get started <svg class="icon"><use href="#i-arrow-right"/></svg>'
+      : 'Next <svg class="icon"><use href="#i-arrow-right"/></svg>';
+  }
+  introNext.addEventListener('click', function(){
+    if(introAt < INTRO.length - 1){ introAt++; paintIntro(); }
+    else show('signup');
+  });
+  paintIntro();
+
+  /* ---------- Password visibility ---------- */
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-pw-toggle]');
+    if(!t) return;
+    var input = t.parentNode.querySelector('input');
+    var showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    t.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    t.querySelector('use').setAttribute('href', showing ? '#i-eye' : '#i-eye-off');
+  });
+
+  /* ---------- Password strength ---------- */
+  var pwInput = document.getElementById('su-pw');
+  var pwMeter = document.getElementById('pw-meter');
+  var pwLabel = document.getElementById('pw-label');
+  var PW_STEPS = [
+    { label:'Use 8 characters or more', fill:0, color:'var(--neutral-200)' },
+    { label:'Weak \u2014 add a number or symbol', fill:1, color:'var(--danger)' },
+    { label:'Fair \u2014 nearly there', fill:2, color:'#C98A08' },
+    { label:'Good', fill:3, color:'var(--accent-ink)' },
+    { label:'Strong', fill:4, color:'var(--accent-ink)' }
+  ];
+  function scorePw(v){
+    if(!v) return 0;
+    var n = 0;
+    if(v.length >= 8) n++;
+    if(v.length >= 12) n++;
+    if(/[0-9]/.test(v) && /[a-zA-Z]/.test(v)) n++;
+    if(/[^a-zA-Z0-9]/.test(v)) n++;
+    return Math.max(1, Math.min(4, n));
+  }
+  pwInput.addEventListener('input', function(){
+    var st = PW_STEPS[scorePw(this.value)];
+    [].forEach.call(pwMeter.children, function(bar, i){
+      bar.style.background = i < st.fill ? st.color : 'var(--neutral-200)';
+    });
+    pwLabel.textContent = st.label;
+    pwLabel.style.color = st.fill >= 3 ? 'var(--accent-ink)' : 'var(--text-tertiary)';
+  });
+
+  /* ---------- Validation ----------
+     Errors are shown on submit, not while typing: flagging a field the moment
+     it is touched is what makes a form feel like it is arguing with you. */
+  function mark(id, bad){ document.getElementById(id).classList.toggle('is-invalid', bad); return !bad; }
+  var digits = function(v){ return (v || '').replace(/\D/g, ''); };
+
+  document.getElementById('login-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok = mark('lf-phone', digits(document.getElementById('li-phone').value).length !== 10);
+    ok = mark('lf-pw', !document.getElementById('li-pw').value) && ok;
+    if(ok) show('home');
+    else this.querySelector('.is-invalid input').focus();
+  });
+
+  document.getElementById('signup-form').addEventListener('submit', function(e){
+    e.preventDefault();
+    var ok = mark('sf-name', !document.getElementById('su-name').value.trim());
+    ok = mark('sf-phone', digits(document.getElementById('su-phone').value).length !== 10) && ok;
+    ok = mark('sf-pw', document.getElementById('su-pw').value.length < 8) && ok;
+    ok = mark('sf-terms', !document.getElementById('su-terms').checked) && ok;
+    if(ok) show('onboarding');   /* straight into the language picker */
+    else { var f = this.querySelector('.is-invalid input'); if(f) f.focus(); }
+  });
+
+  show('splash');
 })();
 </script>
 
