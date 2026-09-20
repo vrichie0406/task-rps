@@ -19,7 +19,17 @@
 const fs = require('fs');
 const path = require('path');
 
-const css = fs.readFileSync(path.join(__dirname, 'design-system/tokens.css'), 'utf8');
+// Works both in the repo (design-system/tokens.css) and inside the
+// standalone design-system package, where tokens.css sits beside this file.
+const candidates = ['design-system/tokens.css', 'tokens.css'];
+const tokensPath = candidates
+  .map(p => path.join(__dirname, p))
+  .find(p => fs.existsSync(p));
+if (!tokensPath) {
+  console.error('validate-contrast: could not find tokens.css in ' + candidates.join(' or '));
+  process.exit(2);
+}
+const css = fs.readFileSync(tokensPath, 'utf8');
 
 // --- resolve tokens, following var() indirection -------------------------
 const raw = {};
